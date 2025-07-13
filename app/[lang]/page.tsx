@@ -616,7 +616,7 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ lan
               </div>
               
               {/* Testimonial 2 - Left and back */}
-              <div className="absolute top-8 -left-4 w-full max-w-md z-10 opacity-80 transform translate-x-12 scale-90 rotate-[-4deg]">
+              <div className="absolute top-8 -left-4 w-full max-w-md z-10 opacity-80 transform translate-x-12 scale-90  ">
                 <div className="bg-gradient-to-br from-white to-emerald-50/80 dark:from-gray-900 dark:to-emerald-950/50 rounded-2xl p-6 shadow-lg relative backdrop-blur-sm border border-emerald-100/60 dark:border-emerald-800/30">
                   <div className="flex items-center gap-4 mb-4">
                     <div className="bg-gradient-to-r from-emerald-500 to-teal-400 w-14 h-14 rounded-full flex items-center justify-center text-white text-lg font-medium shadow-md">
