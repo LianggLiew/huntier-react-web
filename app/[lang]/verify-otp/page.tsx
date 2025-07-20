@@ -10,6 +10,11 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
 import { AnimatedBackground } from '@/components/animated-background';
+import {inBlackList, addToBlacklist} from "@/model/blacklist";
+import {matchOTP, sendOTP} from "@/model/otp";
+import {getAttemptCnt, getResendCnt, addResendCnt, addAttemptCnt} from "@/model/database";
+
+// Removed server-side import that caused Node.js module errors
 
 export default function VerifyOTPPage() {
   const router = useRouter();
@@ -24,7 +29,7 @@ export default function VerifyOTPPage() {
   
   // State for button and timer
   const [isOtpSent, setIsOtpSent] = useState(false);
-  const [countdown, setCountdown] = useState(60);
+  const [countdown, setCountdown] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   
   // Toggle between email and phone verification
@@ -38,52 +43,83 @@ export default function VerifyOTPPage() {
   
   // Send OTP handler
   const handleSendOtp = async () => {
+
     if (!contactValue) {
-      toast({ 
-        title: 'Error', 
-        description: verificationType === 'email' ? 'Please enter your email address' : 'Please enter your phone number', 
-        variant: 'destructive' 
+      toast({
+        title: 'Error',
+        description: verificationType === 'email' ? 'Please enter your email address' : 'Please enter your phone number',
+        variant: 'destructive'
       });
       return;
     }
-    
+
     if (verificationType === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactValue)) {
-      toast({ title: 'Error', description: 'Please enter a valid email address', variant: 'destructive' });
+      toast({title: 'Error', description: 'Please enter a valid email address', variant: 'destructive'});
       return;
     }
-    
+
     if (verificationType === 'phone' && !/^\+?[0-9\s\-\(\)]{8,20}$/.test(contactValue)) {
-      toast({ title: 'Error', description: 'Please enter a valid phone number', variant: 'destructive' });
+      toast({title: 'Error', description: 'Please enter a valid phone number', variant: 'destructive'});
       return;
     }
-    
     setIsLoading(true);
-    
-    try {
-      // API call to send OTP would go here
-      console.log(`Sending OTP to ${verificationType}: ${contactValue}`);
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      setIsOtpSent(true);
-      toast({ 
-        title: 'OTP Sent', 
-        description: `We've sent a verification code to your ${verificationType}` 
+    // Check if contact is blacklisted
+    const isBlackListed = await inBlackList(verificationType, contactValue);
+
+    if(isBlackListed){
+      toast({
+        title: 'Error',
+        description: 'This contact is blacklisted. Please use a different one.',
+        variant: 'destructive'
       });
-    } catch (error) {
-      toast({ 
-        title: 'Failed to send OTP', 
-        description: 'Please try again later', 
-        variant: 'destructive' 
-      });
-    } finally {
+      console.log("You are blacklisted")
       setIsLoading(false);
+      return;
     }
-  };
+
+    // Sent Otp
+    const isSent = await sendOTP(verificationType, contactValue);
+    if(isSent){
+      setIsOtpSent(true);
+      toast({
+        title: 'OTP Sent',
+        description: `We've sent a verification code to your ${verificationType}`
+      });
+    }else{
+      setIsOtpSent(false);
+      toast({
+        title: 'OTP Not Sent',
+        description: `An error has occurred`
+      });
+
+    }
+    setIsLoading(false);
+
+  }
   
   // Resend OTP handler
   const handleResendOtp = () => {
-    setCountdown(60);
-    handleSendOtp();
+    // Check the resend count of user
+    getResendCnt(verificationType, contactValue)
+      .then(result => {
+        if(result > 5){
+          // Check whether user in blacklist
+
+          // Add user to blacklist
+          addToBlacklist(verificationType, contactValue, 'max_resends')
+            .then(result => {
+              console.log("Added to blacklist due to max resends")
+              router.push('/verify-otp')
+            })
+        }else{
+          // Increment Resend count
+          addResendCnt(verificationType, contactValue)
+              .then(result => {
+                setCountdown(1);
+                handleSendOtp();
+              })
+        }
+    })
   };
   
   // Countdown timer effect
@@ -106,26 +142,36 @@ export default function VerifyOTPPage() {
     }
     
     setIsLoading(true);
-    
-    try {
-      // API call to verify OTP would go here
-      console.log(`Verifying OTP: ${otpValue} for ${verificationType}: ${contactValue}`);
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      toast({ 
-        title: 'Verification Successful', 
-        description: 'You have been successfully verified' 
+
+    // Check attempt count
+    const attemptCount = await getAttemptCnt(verificationType, contactValue);
+    const isBlackListed = await inBlackList(verificationType, contactValue);
+    console.log(attemptCount);
+    if (attemptCount > 5) {
+      if(!isBlackListed){const isAdded = await addToBlacklist(verificationType, contactValue, 'max_attempts')}
+      router.push('/');
+    }
+
+    // API call to verify OTP would go here
+    console.log(`Verifying OTP: ${otpValue} for ${verificationType}: ${contactValue}`);
+
+    // Match OTP
+    const isMatch = await matchOTP(verificationType, contactValue, otpValue);
+
+    if(isMatch){
+      toast({
+        title: 'Verification Successful',
+        description: 'You have been successfully verified'
       });
       router.push('/');
-    } catch (error) {
-      toast({ 
-        title: 'Verification Failed', 
-        description: 'Invalid verification code. Please try again.', 
-        variant: 'destructive' 
-      });
-    } finally {
-      setIsLoading(false);
+    }else{
+      console.log("Incorrect OTP");
+
+      // Increment attempt count
+      addAttemptCnt(verificationType, contactValue).then()
     }
+
+    setIsLoading(false);
   };
   
   return (
