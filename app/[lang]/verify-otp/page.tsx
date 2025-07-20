@@ -27,6 +27,12 @@ export default function VerifyOTPPage() {
   const [countdown, setCountdown] = useState(60);
   const [isLoading, setIsLoading] = useState(false);
   
+  // State for user ID (needed for OTP verification)
+  const [userId, setUserId] = useState<string | null>(null);
+  
+  // State for country code selection
+  const [countryCode, setCountryCode] = useState('+86');
+  
   // Toggle between email and phone verification
   const toggleVerificationType = () => {
     setVerificationType(prev => prev === 'email' ? 'phone' : 'email');
@@ -34,9 +40,14 @@ export default function VerifyOTPPage() {
     setOtpValue('');
     setIsOtpSent(false);
     setCountdown(60);
+    setUserId(null);
   };
   
-  // Send OTP handler
+  /**
+   * Handle sending OTP verification code
+   * Makes API call to /api/auth/send-otp endpoint
+   * Validates input and displays appropriate feedback to user
+   */
   const handleSendOtp = async () => {
     if (!contactValue) {
       toast({ 
@@ -57,22 +68,46 @@ export default function VerifyOTPPage() {
       return;
     }
     
+    // Show warning for China numbers
+    if (verificationType === 'phone' && countryCode === '+86') {
+      toast({ 
+        title: 'China SMS Notice', 
+        description: 'SMS to China may be delayed. We recommend using email verification for faster delivery.', 
+        variant: 'default' 
+      });
+    }
+    
     setIsLoading(true);
     
     try {
-      // API call to send OTP would go here
-      console.log(`Sending OTP to ${verificationType}: ${contactValue}`);
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
+      const response = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: verificationType,
+          contact: verificationType === 'phone' ? `${countryCode}${contactValue}` : contactValue,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send OTP');
+      }
+
+      setUserId(data.userId);
       setIsOtpSent(true);
       toast({ 
         title: 'OTP Sent', 
         description: `We've sent a verification code to your ${verificationType}` 
       });
     } catch (error) {
+      console.error('Send OTP error:', error);
       toast({ 
         title: 'Failed to send OTP', 
-        description: 'Please try again later', 
+        description: error instanceof Error ? error.message : 'Please try again later', 
         variant: 'destructive' 
       });
     } finally {
@@ -94,7 +129,11 @@ export default function VerifyOTPPage() {
     return () => clearInterval(timer);
   }, [isOtpSent, countdown]);
   
-  // OTP verification handler
+  /**
+   * Handle OTP verification and user authentication
+   * Makes API call to /api/auth/verify-otp endpoint
+   * Creates user session and redirects on success
+   */
   const handleVerifyOtp = async () => {
     if (otpValue.length < 6) {
       toast({ 
@@ -105,22 +144,54 @@ export default function VerifyOTPPage() {
       return;
     }
     
+    if (!userId) {
+      toast({ 
+        title: 'Error', 
+        description: 'Session expired. Please request a new code', 
+        variant: 'destructive' 
+      });
+      setIsOtpSent(false);
+      return;
+    }
+    
     setIsLoading(true);
     
     try {
-      // API call to verify OTP would go here
-      console.log(`Verifying OTP: ${otpValue} for ${verificationType}: ${contactValue}`);
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
+      const response = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          code: otpValue,
+          type: verificationType,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Verification failed');
+      }
+
       toast({ 
         title: 'Verification Successful', 
         description: 'You have been successfully verified' 
       });
+      
+      // Store access token in localStorage for client-side usage
+      if (data.accessToken) {
+        localStorage.setItem('access-token', data.accessToken);
+      }
+      
+      // Redirect to dashboard or home page
       router.push('/');
     } catch (error) {
+      console.error('Verify OTP error:', error);
       toast({ 
         title: 'Verification Failed', 
-        description: 'Invalid verification code. Please try again.', 
+        description: error instanceof Error ? error.message : 'Invalid verification code. Please try again.', 
         variant: 'destructive' 
       });
     } finally {
@@ -216,10 +287,21 @@ export default function VerifyOTPPage() {
                 {verificationType === 'phone' ? (
                   <div className="relative">
                     <div className="flex">
-                      <div className="flex items-center gap-2 px-3 py-2 border border-r-0 border-emerald-200 dark:border-emerald-800 rounded-l-lg bg-emerald-50/50 dark:bg-emerald-900/20">
-                        <span className="text-sm font-medium text-emerald-600 dark:text-emerald-400">+86</span>
-                        <ChevronDown className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                      </div>
+                      <select 
+                        value={countryCode}
+                        onChange={(e) => setCountryCode(e.target.value)}
+                        disabled={isOtpSent}
+                        className="px-3 py-2 border border-r-0 border-emerald-200 dark:border-emerald-800 rounded-l-lg bg-emerald-50/50 dark:bg-emerald-900/20 text-sm font-medium text-emerald-600 dark:text-emerald-400 focus:outline-none focus:border-emerald-500"
+                      >
+                        <option value="+86">🇨🇳 +86</option>
+                        <option value="+60">🇲🇾 +60</option>
+                        <option value="+65">🇸🇬 +65</option>
+                        <option value="+1">🇺🇸 +1</option>
+                        <option value="+44">🇬🇧 +44</option>
+                        <option value="+81">🇯🇵 +81</option>
+                        <option value="+82">🇰🇷 +82</option>
+                        <option value="+91">🇮🇳 +91</option>
+                      </select>
                       <Input
                         type="tel"
                         placeholder="Phone number"

@@ -5,6 +5,7 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { LanguageToggle } from "@/components/language-toggle"
 import { NavClient } from "@/components/nav-client"
 import { NotificationBell } from "@/components/notification-bell"
+import { LogoutButton } from "@/components/logout-button"
 import { getDictionary } from "@/lib/dictionary"
 
 interface NavbarProps {
@@ -80,6 +81,7 @@ export function Navbar({ lang }: NavbarProps) {
               <span className="sr-only">Profile</span>
             </Link>
           </Button>
+          <LogoutButton />
         </div>
       </div>
     </header>
