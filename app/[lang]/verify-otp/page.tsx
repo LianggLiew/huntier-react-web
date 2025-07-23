@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Mail, Phone, ChevronDown, Sparkles } from 'lucide-react';
+import { Mail, Phone, ChevronDown, Sparkles, Check } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,6 +27,39 @@ export default function VerifyOTPPage() {
   const [countdown, setCountdown] = useState(60);
   const [isLoading, setIsLoading] = useState(false);
   
+  // State for country selection
+  const [selectedCountry, setSelectedCountry] = useState({ code: '+60', name: 'Malaysia', flag: '🇲🇾' });
+  const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false);
+  const countryDropdownRef = useRef<HTMLDivElement>(null);
+  
+  // Popular countries for phone verification
+  const countries = [
+    { code: '+60', name: 'Malaysia', flag: '🇲🇾' },
+    { code: '+65', name: 'Singapore', flag: '🇸🇬' },
+    { code: '+1', name: 'United States', flag: '🇺🇸' },
+    { code: '+44', name: 'United Kingdom', flag: '🇬🇧' },
+    { code: '+86', name: 'China', flag: '🇨🇳' },
+    { code: '+81', name: 'Japan', flag: '🇯🇵' },
+    { code: '+82', name: 'South Korea', flag: '🇰🇷' },
+    { code: '+91', name: 'India', flag: '🇮🇳' },
+    { code: '+61', name: 'Australia', flag: '🇦🇺' },
+    { code: '+49', name: 'Germany', flag: '🇩🇪' },
+    { code: '+33', name: 'France', flag: '🇫🇷' },
+    { code: '+39', name: 'Italy', flag: '🇮🇹' },
+    { code: '+34', name: 'Spain', flag: '🇪🇸' },
+    { code: '+31', name: 'Netherlands', flag: '🇳🇱' },
+    { code: '+41', name: 'Switzerland', flag: '🇨🇭' },
+    { code: '+46', name: 'Sweden', flag: '🇸🇪' },
+    { code: '+47', name: 'Norway', flag: '🇳🇴' },
+    { code: '+45', name: 'Denmark', flag: '🇩🇰' },
+    { code: '+66', name: 'Thailand', flag: '🇹🇭' },
+    { code: '+84', name: 'Vietnam', flag: '🇻🇳' },
+    { code: '+62', name: 'Indonesia', flag: '🇮🇩' },
+    { code: '+63', name: 'Philippines', flag: '🇵🇭' },
+    { code: '+852', name: 'Hong Kong', flag: '🇭🇰' },
+    { code: '+886', name: 'Taiwan', flag: '🇹🇼' },
+  ];
+  
   // Toggle between email and phone verification
   const toggleVerificationType = () => {
     setVerificationType(prev => prev === 'email' ? 'phone' : 'email');
@@ -34,6 +67,14 @@ export default function VerifyOTPPage() {
     setOtpValue('');
     setIsOtpSent(false);
     setCountdown(60);
+    setIsCountryDropdownOpen(false);
+  };
+  
+  // Handle country selection
+  const handleCountrySelect = (country: typeof countries[0]) => {
+    console.log('Country selected:', country);
+    setSelectedCountry(country);
+    setIsCountryDropdownOpen(false);
   };
   
   // Send OTP handler
@@ -60,21 +101,52 @@ export default function VerifyOTPPage() {
     setIsLoading(true);
     
     try {
-      // API call to send OTP would go here
-      console.log(`Sending OTP to ${verificationType}: ${contactValue}`);
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Real API call to send OTP
+      const response = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contactValue: verificationType === 'phone' ? `${selectedCountry.code}${contactValue}` : contactValue,
+          contactType: verificationType,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to send OTP');
+      }
       
       setIsOtpSent(true);
       toast({ 
         title: 'OTP Sent', 
         description: `We've sent a verification code to your ${verificationType}` 
       });
-    } catch (error) {
-      toast({ 
-        title: 'Failed to send OTP', 
-        description: 'Please try again later', 
-        variant: 'destructive' 
-      });
+    } catch (error: any) {
+      console.error('Send OTP error:', error);
+      
+      // Handle different error types
+      if (error.message.includes('blacklist')) {
+        toast({ 
+          title: 'Access Restricted', 
+          description: 'This contact has been temporarily blocked. Please try again later.', 
+          variant: 'destructive' 
+        });
+      } else if (error.message.includes('attempts')) {
+        toast({ 
+          title: 'Too Many Attempts', 
+          description: 'You have exceeded the maximum number of send attempts. Please try again later.', 
+          variant: 'destructive' 
+        });
+      } else {
+        toast({ 
+          title: 'Failed to send OTP', 
+          description: error.message || 'Please try again later', 
+          variant: 'destructive' 
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -94,6 +166,23 @@ export default function VerifyOTPPage() {
     return () => clearInterval(timer);
   }, [isOtpSent, countdown]);
   
+  // Close country dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (countryDropdownRef.current && !countryDropdownRef.current.contains(event.target as Node)) {
+        setIsCountryDropdownOpen(false);
+      }
+    };
+
+    if (isCountryDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isCountryDropdownOpen]);
+  
   // OTP verification handler
   const handleVerifyOtp = async () => {
     if (otpValue.length < 6) {
@@ -108,21 +197,72 @@ export default function VerifyOTPPage() {
     setIsLoading(true);
     
     try {
-      // API call to verify OTP would go here
-      console.log(`Verifying OTP: ${otpValue} for ${verificationType}: ${contactValue}`);
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Real API call to verify OTP
+      const response = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contactValue: verificationType === 'phone' ? `${selectedCountry.code}${contactValue}` : contactValue,
+          contactType: verificationType,
+          otpCode: otpValue,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to verify OTP');
+      }
       
       toast({ 
         title: 'Verification Successful', 
         description: 'You have been successfully verified' 
       });
       router.push('/');
-    } catch (error) {
-      toast({ 
-        title: 'Verification Failed', 
-        description: 'Invalid verification code. Please try again.', 
-        variant: 'destructive' 
-      });
+    } catch (error: any) {
+      console.error('Verify OTP error:', error);
+      
+      // Handle different error types
+      if (error.message.includes('blacklist')) {
+        toast({ 
+          title: 'Access Restricted', 
+          description: 'This contact has been blocked due to too many failed attempts.', 
+          variant: 'destructive' 
+        });
+        // Reset the form since they're blacklisted
+        setIsOtpSent(false);
+        setOtpValue('');
+        setCountdown(60);
+      } else if (error.message.includes('attempts')) {
+        toast({ 
+          title: 'Too Many Failed Attempts', 
+          description: 'Your account has been temporarily locked. Please try again later.', 
+          variant: 'destructive' 
+        });
+        // Reset the form
+        setIsOtpSent(false);
+        setOtpValue('');
+        setCountdown(60);
+      } else if (error.message.includes('expired')) {
+        toast({ 
+          title: 'Code Expired', 
+          description: 'Your verification code has expired. Please request a new one.', 
+          variant: 'destructive' 
+        });
+        setIsOtpSent(false);
+        setOtpValue('');
+        setCountdown(60);
+      } else {
+        toast({ 
+          title: 'Verification Failed', 
+          description: error.message || 'Invalid verification code. Please try again.', 
+          variant: 'destructive' 
+        });
+        // Clear OTP input for retry
+        setOtpValue('');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -216,9 +356,44 @@ export default function VerifyOTPPage() {
                 {verificationType === 'phone' ? (
                   <div className="relative">
                     <div className="flex">
-                      <div className="flex items-center gap-2 px-3 py-2 border border-r-0 border-emerald-200 dark:border-emerald-800 rounded-l-lg bg-emerald-50/50 dark:bg-emerald-900/20">
-                        <span className="text-sm font-medium text-emerald-600 dark:text-emerald-400">+86</span>
-                        <ChevronDown className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                      <div className="relative" ref={countryDropdownRef}>
+                        <button
+                          type="button"
+                          onClick={() => setIsCountryDropdownOpen(!isCountryDropdownOpen)}
+                          disabled={isOtpSent}
+                          className="flex items-center gap-2 px-3 py-2 border border-r-0 border-emerald-200 dark:border-emerald-800 rounded-l-lg bg-emerald-50/50 dark:bg-emerald-900/20 hover:bg-emerald-100/50 dark:hover:bg-emerald-900/40 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <span className="text-base">{selectedCountry.flag}</span>
+                          <span className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
+                            {selectedCountry.code}
+                          </span>
+                          <ChevronDown className={`h-4 w-4 text-emerald-600 dark:text-emerald-400 transition-transform ${isCountryDropdownOpen ? 'rotate-180' : ''}`} />
+                        </button>
+                        
+                        {/* Country Dropdown */}
+                        {isCountryDropdownOpen && (
+                          <div className="absolute top-full left-0 z-50 w-64 mt-1 bg-white dark:bg-gray-800 border border-emerald-200 dark:border-emerald-800 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                            {countries.map((country) => (
+                              <button
+                                key={country.code}
+                                type="button"
+                                onClick={() => handleCountrySelect(country)}
+                                className="w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
+                              >
+                                <span className="text-base">{country.flag}</span>
+                                <span className="text-sm font-medium text-emerald-600 dark:text-emerald-400 min-w-[3rem]">
+                                  {country.code}
+                                </span>
+                                <span className="text-sm text-gray-700 dark:text-gray-300 truncate">
+                                  {country.name}
+                                </span>
+                                {selectedCountry.code === country.code && (
+                                  <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400 ml-auto" />
+                                )}
+                              </button>
+                            ))}
+                          </div>
+                        )}
                       </div>
                       <Input
                         type="tel"
