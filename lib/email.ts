@@ -37,12 +37,12 @@ export async function sendEmail(
       console.error('❌ Resend API returned error:', response.error)
       return {
         success: false,
-        error: `Resend API Error: ${response.error.error || response.error.message || 'Unknown error'}`,
+        error: `Resend API Error: ${(response.error as any)?.message || 'Unknown error'}`,
       }
     }
 
     // Check if we got a message ID
-    const messageId = response.data?.id || response.id
+    const messageId = (response as any)?.data?.id
     if (!messageId) {
       console.error('❌ No message ID returned from Resend')
       return {
