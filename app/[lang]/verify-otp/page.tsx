@@ -10,10 +10,12 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
 import { AnimatedBackground } from '@/components/animated-background';
+import { getDictionary } from '@/lib/dictionary';
 
-export default function VerifyOTPPage() {
+export default function VerifyOTPPage({ params }: { params: Promise<{ lang: string }> | { lang: string } }) {
   const router = useRouter();
   const { toast } = useToast();
+  const [lang, setLang] = useState('en');
   
   // State for verification type (email/phone)
   const [verificationType, setVerificationType] = useState<'email' | 'phone'>('phone');
@@ -59,6 +61,17 @@ export default function VerifyOTPPage() {
     { code: '+852', name: 'Hong Kong', flag: '🇭🇰' },
     { code: '+886', name: 'Taiwan', flag: '🇹🇼' },
   ];
+
+  // Initialize language
+  useEffect(() => {
+    const initializeComponent = async () => {
+      const resolvedParams = await params;
+      setLang(resolvedParams.lang);
+    };
+    initializeComponent();
+  }, [params]);
+
+  const dictionary = getDictionary(lang);
   
   // Toggle between email and phone verification
   const toggleVerificationType = () => {
@@ -82,19 +95,19 @@ export default function VerifyOTPPage() {
     if (!contactValue) {
       toast({ 
         title: 'Error', 
-        description: verificationType === 'email' ? 'Please enter your email address' : 'Please enter your phone number', 
+        description: verificationType === 'email' ? dictionary.verifyOtp.errors.enterEmail : dictionary.verifyOtp.errors.enterPhone, 
         variant: 'destructive' 
       });
       return;
     }
     
     if (verificationType === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactValue)) {
-      toast({ title: 'Error', description: 'Please enter a valid email address', variant: 'destructive' });
+      toast({ title: 'Error', description: dictionary.verifyOtp.errors.validEmail, variant: 'destructive' });
       return;
     }
     
     if (verificationType === 'phone' && !/^\+?[0-9\s\-\(\)]{8,20}$/.test(contactValue)) {
-      toast({ title: 'Error', description: 'Please enter a valid phone number', variant: 'destructive' });
+      toast({ title: 'Error', description: dictionary.verifyOtp.errors.validPhone, variant: 'destructive' });
       return;
     }
     
@@ -121,8 +134,8 @@ export default function VerifyOTPPage() {
       
       setIsOtpSent(true);
       toast({ 
-        title: 'OTP Sent', 
-        description: `We've sent a verification code to your ${verificationType}` 
+        title: dictionary.verifyOtp.errors.otpSent, 
+        description: dictionary.verifyOtp.errors.otpSentDescription.replace('{type}', verificationType === 'email' ? dictionary.verifyOtp.emailVerification.toLowerCase() : dictionary.verifyOtp.phoneVerification.toLowerCase()) 
       });
     } catch (error: any) {
       console.error('Send OTP error:', error);
@@ -130,20 +143,20 @@ export default function VerifyOTPPage() {
       // Handle different error types
       if (error.message.includes('blacklist')) {
         toast({ 
-          title: 'Access Restricted', 
-          description: 'This contact has been temporarily blocked. Please try again later.', 
+          title: dictionary.verifyOtp.errors.accessRestricted, 
+          description: dictionary.verifyOtp.errors.accessRestrictedDescription, 
           variant: 'destructive' 
         });
       } else if (error.message.includes('attempts')) {
         toast({ 
-          title: 'Too Many Attempts', 
-          description: 'You have exceeded the maximum number of send attempts. Please try again later.', 
+          title: dictionary.verifyOtp.errors.tooManyAttempts, 
+          description: dictionary.verifyOtp.errors.tooManyAttemptsDescription, 
           variant: 'destructive' 
         });
       } else {
         toast({ 
-          title: 'Failed to send OTP', 
-          description: error.message || 'Please try again later', 
+          title: dictionary.verifyOtp.errors.sendFailed, 
+          description: error.message || dictionary.verifyOtp.errors.sendFailedDescription, 
           variant: 'destructive' 
         });
       }
@@ -188,7 +201,7 @@ export default function VerifyOTPPage() {
     if (otpValue.length < 6) {
       toast({ 
         title: 'Error', 
-        description: 'Please enter the 6-digit verification code', 
+        description: dictionary.verifyOtp.errors.enter6Digit, 
         variant: 'destructive' 
       });
       return;
@@ -217,8 +230,8 @@ export default function VerifyOTPPage() {
       }
       
       toast({ 
-        title: 'Verification Successful', 
-        description: 'You have been successfully verified' 
+        title: dictionary.verifyOtp.errors.verificationSuccessful, 
+        description: dictionary.verifyOtp.errors.verificationSuccessfulDescription 
       });
       router.push('/');
     } catch (error: any) {
@@ -227,8 +240,8 @@ export default function VerifyOTPPage() {
       // Handle different error types
       if (error.message.includes('blacklist')) {
         toast({ 
-          title: 'Access Restricted', 
-          description: 'This contact has been blocked due to too many failed attempts.', 
+          title: dictionary.verifyOtp.errors.accessRestricted, 
+          description: dictionary.verifyOtp.errors.accessRestrictedDescription, 
           variant: 'destructive' 
         });
         // Reset the form since they're blacklisted
@@ -237,8 +250,8 @@ export default function VerifyOTPPage() {
         setCountdown(60);
       } else if (error.message.includes('attempts')) {
         toast({ 
-          title: 'Too Many Failed Attempts', 
-          description: 'Your account has been temporarily locked. Please try again later.', 
+          title: dictionary.verifyOtp.errors.accountLocked, 
+          description: dictionary.verifyOtp.errors.accountLockedDescription, 
           variant: 'destructive' 
         });
         // Reset the form
@@ -247,8 +260,8 @@ export default function VerifyOTPPage() {
         setCountdown(60);
       } else if (error.message.includes('expired')) {
         toast({ 
-          title: 'Code Expired', 
-          description: 'Your verification code has expired. Please request a new one.', 
+          title: dictionary.verifyOtp.errors.codeExpired, 
+          description: dictionary.verifyOtp.errors.codeExpiredDescription, 
           variant: 'destructive' 
         });
         setIsOtpSent(false);
@@ -256,8 +269,8 @@ export default function VerifyOTPPage() {
         setCountdown(60);
       } else {
         toast({ 
-          title: 'Verification Failed', 
-          description: error.message || 'Invalid verification code. Please try again.', 
+          title: dictionary.verifyOtp.errors.verificationFailed, 
+          description: error.message || dictionary.verifyOtp.errors.verificationFailedDescription, 
           variant: 'destructive' 
         });
         // Clear OTP input for retry
@@ -297,15 +310,15 @@ export default function VerifyOTPPage() {
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
               </span>
               <span className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
-                Verification Required
+                {dictionary.verifyOtp.verificationRequired}
               </span>
             </div>
             
             <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-700 to-gray-600 dark:from-white dark:via-gray-200 dark:to-gray-400">
-              Passwordless Login
+              {dictionary.verifyOtp.passwordlessLogin}
             </h1>
             <p className="text-muted-foreground text-lg">
-              Verify your identity to access your account
+              {dictionary.verifyOtp.verifyIdentity}
             </p>
           </div>
 
@@ -319,8 +332,8 @@ export default function VerifyOTPPage() {
                 {/* Verification type toggle */}
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <span>I want to find a job</span>
-                    <span className="text-emerald-600 dark:text-emerald-400">I want to hire</span>
+                    <span>{dictionary.verifyOtp.findJob}</span>
+                    <span className="text-emerald-600 dark:text-emerald-400">{dictionary.verifyOtp.wantToHire}</span>
                   </div>
                 </div>
                 
@@ -341,12 +354,12 @@ export default function VerifyOTPPage() {
               </div>
               
               <CardTitle className="text-2xl text-center font-bold">
-                {verificationType === 'email' ? 'Email Verification' : 'Phone Verification'}
+                {verificationType === 'email' ? dictionary.verifyOtp.emailVerification : dictionary.verifyOtp.phoneVerification}
               </CardTitle>
               <p className="text-sm text-muted-foreground text-center">
                 {verificationType === 'email' 
-                  ? 'We\'ll send a verification code to your email address' 
-                  : 'We\'ll send a verification code to your phone number'}
+                  ? dictionary.verifyOtp.emailDescription 
+                  : dictionary.verifyOtp.phoneDescription}
               </p>
             </CardHeader>
             
@@ -397,7 +410,7 @@ export default function VerifyOTPPage() {
                       </div>
                       <Input
                         type="tel"
-                        placeholder="Phone number"
+                        placeholder={dictionary.verifyOtp.placeholders.phone}
                         value={contactValue}
                         onChange={(e) => setContactValue(e.target.value)}
                         disabled={isOtpSent}
@@ -408,7 +421,7 @@ export default function VerifyOTPPage() {
                 ) : (
                   <Input
                     type="email"
-                    placeholder="Enter your email address"
+                    placeholder={dictionary.verifyOtp.placeholders.email}
                     value={contactValue}
                     onChange={(e) => setContactValue(e.target.value)}
                     disabled={isOtpSent}
@@ -421,7 +434,7 @@ export default function VerifyOTPPage() {
                   <div className="space-y-4 pt-2">
                     <div className="text-center">
                       <p className="text-sm text-muted-foreground mb-4">
-                        Enter the 6-digit verification code sent to your {verificationType}
+                        {dictionary.verifyOtp.enterCode.replace('{type}', verificationType === 'email' ? dictionary.verifyOtp.emailVerification.toLowerCase() : dictionary.verifyOtp.phoneVerification.toLowerCase())}
                       </p>
                       
                       <div className="flex justify-center">
@@ -458,12 +471,12 @@ export default function VerifyOTPPage() {
                     {isLoading ? (
                       <div className="flex items-center gap-2">
                         <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                        Sending verification code...
+                        {dictionary.verifyOtp.sendingCode}
                       </div>
                     ) : (
                       <div className="flex items-center gap-2">
                         <Sparkles className="h-5 w-5" />
-                        Send verification code
+                        {dictionary.verifyOtp.sendCode}
                       </div>
                     )}
                   </Button>
@@ -477,10 +490,10 @@ export default function VerifyOTPPage() {
                       {isLoading ? (
                         <div className="flex items-center gap-2">
                           <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                          Verifying...
+                          {dictionary.verifyOtp.verifying}
                         </div>
                       ) : (
-                        'Login/Register'
+                        dictionary.verifyOtp.loginRegister
                       )}
                     </Button>
                     
@@ -490,7 +503,7 @@ export default function VerifyOTPPage() {
                       variant="outline"
                       className="w-full rounded-lg border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 py-6 text-lg"
                     >
-                      {countdown > 0 ? `Resend code (${countdown}s)` : 'Resend verification code'}
+                      {countdown > 0 ? dictionary.verifyOtp.resendCodeTimer.replace('{time}', countdown.toString()) : dictionary.verifyOtp.resendCode}
                     </Button>
                   </div>
                 )}
@@ -514,7 +527,7 @@ export default function VerifyOTPPage() {
                   <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
                     <span className="text-white text-xs font-bold">微</span>
                   </div>
-                  WeChat Login/Register
+                  {dictionary.verifyOtp.wechatLogin}
                 </div>
               </Button>
             </CardContent>
@@ -525,16 +538,16 @@ export default function VerifyOTPPage() {
             <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
               <input type="checkbox" className="rounded border-emerald-300 text-emerald-600 focus:ring-emerald-500" />
               <span>
-                I have read and agree to the{' '}
-                <a href="#" className="text-emerald-600 dark:text-emerald-400 hover:underline">Terms of Service</a>{' '}
-                and{' '}
-                <a href="#" className="text-emerald-600 dark:text-emerald-400 hover:underline">Privacy Policy</a>
+                {dictionary.verifyOtp.termsText}{' '}
+                <a href="#" className="text-emerald-600 dark:text-emerald-400 hover:underline">{dictionary.verifyOtp.termsOfService}</a>{' '}
+                {dictionary.verifyOtp.and}{' '}
+                <a href="#" className="text-emerald-600 dark:text-emerald-400 hover:underline">{dictionary.verifyOtp.privacyPolicy}</a>
               </span>
             </div>
             
             <div className="space-y-2 text-sm text-muted-foreground">
-              <p>Customer Service: 400-065-5799 | Working Hours: 8:00-22:00</p>
-              <p>Human Resources Service License | Business License | Chaoyang District Social Bureau Supervision</p>
+              <p>{dictionary.verifyOtp.customerService}</p>
+              <p>{dictionary.verifyOtp.licenseInfo}</p>
             </div>
           </div>
         </div>

@@ -1,3 +1,5 @@
+'use client'
+
 import Link from "next/link"
 import { BriefcaseBusiness, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -6,6 +8,8 @@ import { LanguageToggle } from "@/components/language-toggle"
 import { NavClient } from "@/components/nav-client"
 import { NotificationBell } from "@/components/notification-bell"
 import { getDictionary } from "@/lib/dictionary"
+import { useScrollDirection } from "@/hooks/useScrollDirection"
+import { cn } from "@/lib/utils"
 
 interface NavbarProps {
   lang: string
@@ -13,6 +17,7 @@ interface NavbarProps {
 
 export function Navbar({ lang }: NavbarProps) {
   const dictionary = getDictionary(lang)
+  const { scrollDirection, isAtTop } = useScrollDirection()
 
   // Sample notifications for demo purposes
   const sampleNotifications = [
@@ -46,7 +51,10 @@ export function Navbar({ lang }: NavbarProps) {
   ]
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/60">
+    <header className={cn(
+      "fixed top-0 z-50 w-full border-b bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/60 transition-transform duration-300 ease-in-out",
+      scrollDirection === 'down' && !isAtTop ? '-translate-y-full' : 'translate-y-0'
+    )}>
       <div className="container max-w-7xl mx-auto px-4 sm:px-6 flex h-16 items-center justify-between">
         <div className="flex items-center gap-2">
           <Link 
