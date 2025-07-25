@@ -1,4 +1,3 @@
-import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 
 export default async function LocaleLayout({
@@ -14,7 +13,6 @@ export default async function LocaleLayout({
 
   return (
     <div className="flex min-h-screen flex-col overflow-hidden">
-      <Navbar lang={lang} />
       <main className="flex-1 w-full isolate">
         {children}
       </main>

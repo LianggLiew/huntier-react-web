@@ -13,7 +13,7 @@ export function Footer({ lang }: FooterProps) {
     <footer className="border-t bg-background relative">
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGZpbGw9IiMxMGIyODEiIGZpbGwtb3BhY2l0eT0iLjAzIiBkPSJNMzYgMzRoLTJ2LTJoMnYyem0tNCAwaDJ2LTJoMnptLTQgMGgydi0yaDB6Ii8+PC9nPjwvc3ZnPg==')] opacity-20 dark:opacity-10 pointer-events-none"></div>
       
-      <div className="container max-w-7xl mx-auto pt-12 pb-8 px-4 relative z-10">
+      <div className="container max-w-7xl mx-auto pt-12 pb-8 px-4 relative z-0">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
           <div>
             <div className="flex items-center gap-2 mb-4">

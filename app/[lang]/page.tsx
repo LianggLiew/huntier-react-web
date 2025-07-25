@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
 import { AnimatedBackground } from "@/components/animated-background";
+import { Navbar } from "@/components/navbar";
 
 export default async function LocaleHomePage({ params }: { params: Promise<{ lang: string }> | { lang: string } }) {
   // Await the params if it's a promise
@@ -29,6 +30,8 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ lan
   
   return (
     <>
+      <Navbar lang={lang} />
+      <div className="pt-16">
       {/* Add a prominent link to the onboarding flow */}
       <div className="fixed bottom-10 right-10 z-50">
         <Link href={`/${resolvedParams.lang}/onboarding`}>
@@ -838,6 +841,7 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ lan
           </div>
         </div>
       </section>
+      </div>
     </>
   );
 }
