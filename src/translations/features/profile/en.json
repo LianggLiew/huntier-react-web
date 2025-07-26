@@ -1,0 +1,79 @@
+{
+  "loading": "Loading profile...",
+  "tabs": {
+    "profile": "Profile",
+    "applications": "Applications", 
+    "savedJobs": "Saved Jobs"
+  },
+  "jobApplications": "Job Applications",
+  "savedJobs": "Saved Jobs",
+  "buttons": {
+    "viewApplication": "View Application",
+    "withdraw": "Withdraw",
+    "viewJob": "View Job", 
+    "applyNow": "Apply Now",
+    "remove": "Remove",
+    "edit": "Edit",
+    "save": "Save",
+    "cancel": "Cancel",
+    "add": "Add",
+    "delete": "Delete"
+  },
+  "sections": {
+    "about": "About",
+    "experience": "Experience",
+    "education": "Education",
+    "skills": "Skills", 
+    "certifications": "Certifications",
+    "projects": "Projects"
+  },
+  "forms": {
+    "jobTitle": "Job Title",
+    "company": "Company",
+    "period": "Period (e.g., Jan 2021 - Present)",
+    "description": "Description",
+    "degree": "Degree",
+    "institution": "Institution",
+    "skillName": "Skill Name",
+    "proficiency": "Proficiency",
+    "certificationName": "Certification Name", 
+    "issuer": "Issuer",
+    "year": "Year",
+    "projectName": "Project Name",
+    "technologies": "Technologies",
+    "addExperience": "Add Experience",
+    "addEducation": "Add Education",
+    "addSkill": "Add Skill",
+    "addCertification": "Add Certification",
+    "addProject": "Add Project"
+  },
+  "sidebar": {
+    "profileCompletion": "Profile Completion",
+    "overall": "Overall",
+    "jobPreferences": "Job Preferences",
+    "jobTypes": "Job Types",
+    "locations": "Locations",
+    "desiredSalary": "Desired Salary",
+    "industries": "Industries",
+    "remotePreference": "Remote Preference",
+    "cv": "CV"
+  },
+  "toast": {
+    "aboutUpdated": "About section updated",
+    "aboutDescription": "Your about section has been saved successfully.",
+    "experienceUpdated": "Experience updated",
+    "experienceDescription": "Your work experience has been saved successfully.",
+    "educationUpdated": "Education updated",
+    "educationDescription": "Your education details have been saved successfully.",
+    "skillsUpdated": "Skills updated", 
+    "skillsDescription": "Your skills have been saved successfully.",
+    "certificationsUpdated": "Certifications updated",
+    "certificationsDescription": "Your certifications have been saved successfully.",
+    "projectsUpdated": "Projects updated",
+    "projectsDescription": "Your projects have been saved successfully.",
+    "personalInfoUpdated": "Personal info updated",
+    "personalInfoDescription": "Your personal information has been saved successfully.",
+    "profilePictureUpdated": "Profile picture updated",
+    "profilePictureDescription": "Your profile picture has been updated successfully."
+  }
+}

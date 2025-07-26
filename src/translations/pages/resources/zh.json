@@ -1,0 +1,23 @@
+{
+  "title": "职业资源",
+  "subtitle": "通过我们精心策划的资源、指南和工具提升您的职业生涯",
+  "searchPlaceholder": "搜索资源...",
+  "categories": {
+    "all": "所有资源",
+    "articles": "文章",
+    "videos": "视频",
+    "tools": "工具",
+    "guides": "指南"
+  },
+  "featured": "精选资源",
+  "popular": "热门资源",
+  "newContent": "最新内容",
+  "readMore": "阅读更多",
+  "watchNow": "立即观看",
+  "tryNow": "立即尝试",
+  "saveButton": "保存",
+  "savedButton": "已保存",
+  "relatedResources": "相关资源",
+  "shareResource": "分享资源",
+  "filterByTopic": "按主题筛选"
+}

@@ -205,7 +205,7 @@ export function JobDetail({ jobId, lang }: JobDetailProps) {
               {/* Badges */}
               <div className="flex flex-wrap gap-2">
                 <Badge className={cn("text-sm", getTypeBadgeColor(job.type))}>
-                  {job.type.replace('-', ' ')}
+                  {job.type?.replace('-', ' ') || job.type || 'Full-time'}
                 </Badge>
                 {job.isRemote && (
                   <Badge className="text-sm bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100">

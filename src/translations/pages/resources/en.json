@@ -1,0 +1,23 @@
+{
+  "title": "Career Resources",
+  "subtitle": "Enhance your career with our curated collection of resources, guides, and tools",
+  "searchPlaceholder": "Search resources...",
+  "categories": {
+    "all": "All Resources",
+    "articles": "Articles",
+    "videos": "Videos",
+    "tools": "Tools",
+    "guides": "Guides"
+  },
+  "featured": "Featured Resource",
+  "popular": "Popular Resources",
+  "newContent": "New Content",
+  "readMore": "Read More",
+  "watchNow": "Watch Now",
+  "tryNow": "Try Now",
+  "saveButton": "Save",
+  "savedButton": "Saved",
+  "relatedResources": "Related Resources",
+  "shareResource": "Share Resource",
+  "filterByTopic": "Filter by Topic"
+}

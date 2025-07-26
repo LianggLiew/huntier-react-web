@@ -1,0 +1,79 @@
+{
+  "loading": "加载个人资料...",
+  "tabs": {
+    "profile": "个人资料",
+    "applications": "申请记录",
+    "savedJobs": "已保存职位"
+  },
+  "jobApplications": "工作申请",
+  "savedJobs": "已保存职位",
+  "buttons": {
+    "viewApplication": "查看申请",
+    "withdraw": "撤回",
+    "viewJob": "查看职位",
+    "applyNow": "立即申请",
+    "remove": "移除",
+    "edit": "编辑",
+    "save": "保存",
+    "cancel": "取消",
+    "add": "添加",
+    "delete": "删除"
+  },
+  "sections": {
+    "about": "关于我",
+    "experience": "工作经历",
+    "education": "教育背景",
+    "skills": "技能",
+    "certifications": "证书",
+    "projects": "项目经验"
+  },
+  "forms": {
+    "jobTitle": "职位名称",
+    "company": "公司",
+    "period": "时间段 (例如：2021年1月 - 至今)",
+    "description": "工作描述",
+    "degree": "学位",
+    "institution": "学校",
+    "skillName": "技能名称",
+    "proficiency": "熟练程度",
+    "certificationName": "证书名称",
+    "issuer": "颁发机构",
+    "year": "年份",
+    "projectName": "项目名称",
+    "technologies": "技术栈",
+    "addExperience": "添加工作经历",
+    "addEducation": "添加教育经历",
+    "addSkill": "添加技能",
+    "addCertification": "添加证书",
+    "addProject": "添加项目"
+  },
+  "sidebar": {
+    "profileCompletion": "资料完成度",
+    "overall": "总体",
+    "jobPreferences": "求职偏好",
+    "jobTypes": "职位类型",
+    "locations": "工作地点",
+    "desiredSalary": "期望薪资",
+    "industries": "行业",
+    "remotePreference": "远程工作偏好",
+    "cv": "简历"
+  },
+  "toast": {
+    "aboutUpdated": "关于部分已更新",
+    "aboutDescription": "您的关于部分已成功保存。",
+    "experienceUpdated": "工作经历已更新",
+    "experienceDescription": "您的工作经历已成功保存。",
+    "educationUpdated": "教育背景已更新",
+    "educationDescription": "您的教育详情已成功保存。",
+    "skillsUpdated": "技能已更新",
+    "skillsDescription": "您的技能已成功保存。",
+    "certificationsUpdated": "证书已更新",
+    "certificationsDescription": "您的证书已成功保存。",
+    "projectsUpdated": "项目已更新",
+    "projectsDescription": "您的项目已成功保存。",
+    "personalInfoUpdated": "个人信息已更新",
+    "personalInfoDescription": "您的个人信息已成功保存。",
+    "profilePictureUpdated": "头像已更新",
+    "profilePictureDescription": "您的头像已成功更新。"
+  }
+}

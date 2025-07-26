@@ -1,0 +1,27 @@
+{
+  "navbar": {
+    "findJobs": "寻找工作",
+    "companies": "公司",
+    "resources": "资源", 
+    "about": "关于我们",
+    "myProfile": "我的简历"
+  },
+  "footer": {
+    "termsOfService": "服务条款",
+    "privacy": "隐私政策",
+    "cookies": "Cookie 政策",
+    "copyright": "© {year} Huntier Inc. 保留所有权利。"
+  },
+  "languageToggle": {
+    "english": "English",
+    "chinese": "中文"
+  },
+  "navigation": {
+    "home": "首页",
+    "jobs": "职位",
+    "resume": "简历",
+    "interviews": "面试", 
+    "points": "积分",
+    "profile": "个人资料"
+  }
+}

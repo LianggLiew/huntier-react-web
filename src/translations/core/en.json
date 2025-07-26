@@ -1,0 +1,27 @@
+{
+  "navbar": {
+    "findJobs": "Find Jobs",
+    "companies": "Companies", 
+    "resources": "Resources",
+    "about": "About",
+    "myProfile": "My Profile"
+  },
+  "footer": {
+    "termsOfService": "Terms of Service",
+    "privacy": "Privacy",
+    "cookies": "Cookies",
+    "copyright": "© {year} Huntier Inc. All rights reserved."
+  },
+  "languageToggle": {
+    "english": "English",
+    "chinese": "中文 (Chinese)"
+  },
+  "navigation": {
+    "home": "Home",
+    "jobs": "Jobs",
+    "resume": "Resume", 
+    "interviews": "Interviews",
+    "points": "Points",
+    "profile": "Profile"
+  }
+}

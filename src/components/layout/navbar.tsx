@@ -7,7 +7,7 @@ import { ThemeToggle } from "@/components/shared/theme-toggle"
 import { LanguageToggle } from "@/components/shared/language-toggle"
 import { NavClient } from "@/components/layout/nav-client"
 import { NotificationBell } from "@/components/shared/notification-bell"
-import { getDictionary } from "@/lib/dictionary"
+import { useTranslation } from "@/hooks/use-translations"
 import { useScrollDirection } from "@/hooks/useScrollDirection"
 import { cn } from "@/lib/utils"
 
@@ -16,8 +16,26 @@ interface NavbarProps {
 }
 
 export function Navbar({ lang }: NavbarProps) {
-  const dictionary = getDictionary(lang)
+  const { translation: coreTranslations, loading } = useTranslation('core', lang)
   const { scrollDirection, isAtTop } = useScrollDirection()
+
+  // Show loading skeleton while translations load
+  if (loading) {
+    return (
+      <header className="fixed top-0 z-50 w-full border-b bg-background/95 backdrop-blur-sm">
+        <div className="container max-w-7xl mx-auto px-4 sm:px-6 flex h-16 items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="h-6 w-6 bg-muted animate-pulse rounded"></div>
+            <div className="h-6 w-20 bg-muted animate-pulse rounded"></div>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="h-8 w-8 bg-muted animate-pulse rounded"></div>
+            <div className="h-8 w-16 bg-muted animate-pulse rounded"></div>
+          </div>
+        </div>
+      </header>
+    )
+  }
 
   // Sample notifications for demo purposes
   const sampleNotifications = [
@@ -45,9 +63,8 @@ export function Navbar({ lang }: NavbarProps) {
   ]
 
   const navItems = [
-
-    { name: dictionary.navbar.resources, href: `/${lang}/resources` },
-    { name: dictionary.navbar.about, href: `/${lang}/about` },
+    { name: coreTranslations.navbar?.resources || 'Resources', href: `/${lang}/resources` },
+    { name: coreTranslations.navbar?.about || 'About', href: `/${lang}/about` },
   ]
 
   return (
@@ -70,15 +87,15 @@ export function Navbar({ lang }: NavbarProps) {
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-emerald-500 group-hover:w-full transition-all duration-300"></span>
             </span>
           </Link>
-          <NavClient lang={lang} navItems={navItems} myProfileText={dictionary.navbar.myProfile} />
+          <NavClient lang={lang} navItems={navItems} myProfileText={coreTranslations.navbar?.myProfile || 'My Profile'} />
         </div>
         <div className="flex items-center gap-4">
           <ThemeToggle />
           <LanguageToggle
             lang={lang}
             translations={{
-              english: dictionary.languageToggle.english,
-              chinese: dictionary.languageToggle.chinese,
+              english: coreTranslations.languageToggle?.english || 'English',
+              chinese: coreTranslations.languageToggle?.chinese || '中文',
             }}
           />
           <NotificationBell notifications={sampleNotifications} />

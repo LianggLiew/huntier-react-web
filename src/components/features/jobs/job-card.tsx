@@ -68,7 +68,7 @@ export function JobCard({
         <div className="flex gap-4">
           {/* Company Logo */}
           <div className="hidden sm:flex h-14 w-14 rounded-full overflow-hidden bg-gradient-to-br from-emerald-50 to-teal-100 dark:from-emerald-900/70 dark:to-teal-900/30 flex-shrink-0 items-center justify-center text-emerald-600 dark:text-emerald-300 text-lg font-semibold shadow-sm">
-            {company.substring(0, 2).toUpperCase()}
+            {company?.substring(0, 2).toUpperCase() || 'CO'}
           </div>
           
           <div className="flex-1">
@@ -97,7 +97,7 @@ export function JobCard({
               </div>
               <div className="flex items-center gap-1">
                 <Clock className="h-3.5 w-3.5" />
-                <span>{postedDate.replace('Posted ', '')}</span>
+                <span>{postedDate?.replace('Posted ', '') || postedDate || 'Recently'}</span>
               </div>
               <div className="font-medium text-emerald-600 dark:text-emerald-400">{salary}</div>
             </div>
@@ -109,14 +109,14 @@ export function JobCard({
             
             {/* Skills */}
             <div className="mt-4 flex flex-wrap gap-1.5">
-              {skills.slice(0, 4).map((skill) => (
+              {(skills || []).slice(0, 4).map((skill) => (
                 <Badge key={skill} variant="outline" className="bg-white/70 dark:bg-gray-800/50 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors border-emerald-100 dark:border-emerald-900/30">
                   {skill}
                 </Badge>
               ))}
-              {skills.length > 4 && (
+              {(skills || []).length > 4 && (
                 <Badge variant="outline" className="bg-white/50 dark:bg-gray-800/30 text-muted-foreground border-emerald-100/50 dark:border-emerald-900/20">
-                  +{skills.length - 4} more
+                  +{(skills || []).length - 4} more
                 </Badge>
               )}
             </div>
