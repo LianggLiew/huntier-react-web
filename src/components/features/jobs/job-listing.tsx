@@ -385,7 +385,7 @@ export function JobListing({
         {/* Main Content - Dynamic width based on filter panel */}
         <div 
           className={cn(
-            "transition-all duration-300 ease-in-out",
+            "transition-all duration-300 ease-in-out flex-1 overflow-y-auto",
             showFilters ? "flex-1" : "w-full"
           )}
         >
