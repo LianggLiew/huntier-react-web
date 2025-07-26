@@ -8,7 +8,7 @@ interface JobsPageProps {
 }
 
 export default async function JobsPage({ params }: JobsPageProps) {
-  const resolvedParams = await params
+  const resolvedParams = await Promise.resolve(params)
   const lang = resolvedParams.lang
   const dictionary = getDictionary(lang)
 
