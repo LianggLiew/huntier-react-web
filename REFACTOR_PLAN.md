@@ -178,7 +178,27 @@ If issues arise:
 - Update imports immediately after moving files
 - Keep original structure intact until refactor is complete and tested
 
+## Current Import Dependencies Analysis
+
+### Files importing from @/components/:
+- `app/layout.tsx` → theme-provider, ui/tooltip
+- `app/[lang]/layout.tsx` → footer
+- `app/[lang]/page.tsx` → ui/button, animated-background, navbar
+- `app/[lang]/jobs/page.tsx` → ui/navigation-sidebar, jobs/*
+- `app/[lang]/about/page.tsx` → ui/*, navbar
+- `app/[lang]/onboarding/page.tsx` → ui/*, onboarding/*
+- `app/[lang]/profile/page.tsx` → ui/*, profile/*
+- `app/[lang]/verify-otp/page.tsx` → ui/*, animated-background
+- `components/*.tsx` → Heavy usage of ui/* throughout
+- `components/navbar.tsx` → Multiple shared components (theme-toggle, language-toggle, etc.)
+
+### Critical Dependencies to Update:
+1. **Layout Components**: navbar, footer, nav-client (used in multiple pages)
+2. **Shared Components**: theme-toggle, language-toggle, notification-bell, animated-background
+3. **Feature Components**: jobs/*, onboarding/*, profile/*
+4. **UI Components**: All ui/* imports (most frequent)
+
 ---
-**Status**: Planning Phase
-**Started**: [Date]
-**Completed**: [Date]
+**Status**: Phase 1 Complete - Ready for Phase 2
+**Started**: 2025-07-26
+**Phase 1 Completed**: 2025-07-26

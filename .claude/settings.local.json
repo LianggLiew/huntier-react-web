@@ -1,16 +1,14 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm install:*)",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
       "Bash(mkdir:*)",
-      "Bash(node:*)",
-      "Bash(npm run dev:*)",
-      "Bash(npm run typecheck:*)",
-      "Bash(npm run:*)",
-      "Bash(timeout 10 npm run dev)",
-      "Bash(ls:*)",
-      "Bash(sed:*)",
-      "Bash(rm:*)"
+      "Bash(git mv:*)",
+      "Bash(mv:*)",
+      "Bash(rmdir:*)",
+      "Bash(tree:*)"
     ],
     "deny": []
   }
