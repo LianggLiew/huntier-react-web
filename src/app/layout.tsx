@@ -2,7 +2,7 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
+import { ThemeProvider } from "@/components/shared/theme-provider"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { Analytics } from "@vercel/analytics/next"
 

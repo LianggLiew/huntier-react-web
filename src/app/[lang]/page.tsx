@@ -19,8 +19,8 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
-import { AnimatedBackground } from "@/components/animated-background";
-import { Navbar } from "@/components/navbar";
+import { AnimatedBackground } from "@/components/shared/animated-background";
+import { Navbar } from "@/components/layout/navbar";
 
 export default async function LocaleHomePage({ params }: { params: Promise<{ lang: string }> | { lang: string } }) {
   // Await the params if it's a promise

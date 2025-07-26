@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
-import { AnimatedBackground } from '@/components/animated-background';
+import { AnimatedBackground } from '@/components/shared/animated-background';
 import { getDictionary } from '@/lib/dictionary';
 
 export default function VerifyOTPPage({ params }: { params: Promise<{ lang: string }> | { lang: string } }) {

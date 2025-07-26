@@ -1,7 +1,7 @@
 import { NavigationSidebar } from "@/components/ui/navigation-sidebar"
-import { JobListing } from "@/components/jobs/job-listing"
+import { JobListing } from "@/components/features/jobs/job-listing"
 import { getDictionary } from "@/lib/dictionary"
-import { JobListingContainer } from "@/components/jobs/job-listing-container"
+import { JobListingContainer } from "@/components/features/jobs/job-listing-container"
 
 interface JobsPageProps {
   params: Promise<{ lang: string }> | { lang: string }

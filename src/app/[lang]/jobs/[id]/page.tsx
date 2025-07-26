@@ -1,5 +1,5 @@
 import { NavigationSidebar } from "@/components/ui/navigation-sidebar"
-import { JobDetail } from "@/components/jobs/job-detail"
+import { JobDetail } from "@/components/features/jobs/job-detail"
 import { getDictionary } from "@/lib/dictionary"
 
 interface JobDetailPageProps {

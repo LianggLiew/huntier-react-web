@@ -1,5 +1,5 @@
 import { getDictionary } from "@/lib/dictionary"
-import { ResourcesClient } from "@/components/resources-client"
+import { ResourcesClient } from "@/components/features/resources/resources-client"
 
 export default async function ResourcesPage({ params }: { params: Promise<{ lang: string }> | { lang: string } }) {
   // Await the params if it's a promise

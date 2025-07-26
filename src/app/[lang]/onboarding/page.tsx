@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Upload, FileText, ArrowRight, ArrowLeft, User } from 'lucide-react'
-import PersonalInfoForm, { type PersonalInfo } from '@/components/onboarding/PersonalInfoForm'
+import PersonalInfoForm, { type PersonalInfo } from '@/components/features/onboarding/PersonalInfoForm'
 
 export default function OnboardingPage() {
   const [currentStep, setCurrentStep] = useState(1)

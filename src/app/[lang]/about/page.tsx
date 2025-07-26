@@ -3,7 +3,7 @@ import { ArrowRight, Award, Brain, CheckCircle, ChevronRight, Globe, HeartHandsh
 import { Button } from "@/components/ui/button"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { getDictionary } from "@/lib/dictionary"
-import { Navbar } from "@/components/navbar"
+import { Navbar } from "@/components/layout/navbar"
 
 // Sample team data with bilingual roles
 const getTeamMembers = (lang: string) => [

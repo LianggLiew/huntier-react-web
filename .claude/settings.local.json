@@ -8,7 +8,8 @@
       "Bash(git mv:*)",
       "Bash(mv:*)",
       "Bash(rmdir:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(find:*)"
     ],
     "deny": []
   }
