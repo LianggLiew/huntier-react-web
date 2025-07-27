@@ -106,6 +106,117 @@ const PaginationEllipsis = ({
 )
 PaginationEllipsis.displayName = "PaginationEllipsis"
 
+interface JobPaginationProps {
+  currentPage: number
+  totalPages: number
+  onPageChange: (page: number) => void
+}
+
+const JobPagination = ({ 
+  currentPage, 
+  totalPages, 
+  onPageChange 
+}: JobPaginationProps) => {
+  if (totalPages <= 1) return null
+
+  const handlePageChange = (page: number) => {
+    onPageChange(page)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const getVisiblePages = () => {
+    const maxVisible = 5
+    const pages: number[] = []
+    
+    if (totalPages <= maxVisible) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i)
+      }
+    } else {
+      let start = Math.max(1, currentPage - 2)
+      let end = Math.min(totalPages, start + maxVisible - 1)
+      
+      if (end - start < maxVisible - 1) {
+        start = Math.max(1, end - maxVisible + 1)
+      }
+      
+      for (let i = start; i <= end; i++) {
+        pages.push(i)
+      }
+    }
+    
+    return pages
+  }
+
+  const visiblePages = getVisiblePages()
+  const showStartEllipsis = visiblePages[0] > 1
+  const showEndEllipsis = visiblePages[visiblePages.length - 1] < totalPages
+
+  return (
+    <Pagination className="mt-8">
+      <PaginationContent>
+        <PaginationItem>
+          <PaginationPrevious 
+            onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+            className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+          />
+        </PaginationItem>
+
+        {showStartEllipsis && (
+          <>
+            <PaginationItem>
+              <PaginationLink 
+                onClick={() => handlePageChange(1)}
+                className="cursor-pointer"
+              >
+                1
+              </PaginationLink>
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationEllipsis />
+            </PaginationItem>
+          </>
+        )}
+
+        {visiblePages.map((page) => (
+          <PaginationItem key={page}>
+            <PaginationLink
+              onClick={() => handlePageChange(page)}
+              isActive={currentPage === page}
+              className="cursor-pointer"
+            >
+              {page}
+            </PaginationLink>
+          </PaginationItem>
+        ))}
+
+        {showEndEllipsis && (
+          <>
+            <PaginationItem>
+              <PaginationEllipsis />
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationLink 
+                onClick={() => handlePageChange(totalPages)}
+                className="cursor-pointer"
+              >
+                {totalPages}
+              </PaginationLink>
+            </PaginationItem>
+          </>
+        )}
+
+        <PaginationItem>
+          <PaginationNext 
+            onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+            className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+          />
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
+  )
+}
+
 export {
   Pagination,
   PaginationContent,
@@ -114,4 +225,5 @@ export {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
+  JobPagination,
 }

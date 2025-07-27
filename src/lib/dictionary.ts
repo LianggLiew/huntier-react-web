@@ -160,8 +160,7 @@ const dictionaries: Record<string, any> = {
       }
     },
     jobs: {
-      title: "Job Opportunities",
-      subtitle: "Discover your next career opportunity with AI-powered matching"
+      title: "Explore Job Opportunities with Huntier",
     },
     home: {
       title: "Find Your Dream Job with",
@@ -380,8 +379,7 @@ const dictionaries: Record<string, any> = {
       filterByTopic: "按主题筛选"
     },
     jobs: {
-      title: "职位机会",
-      subtitle: "通过AI驱动的匹配发现您的下一个职业机会"
+      title: "与 Huntier 一起探索职位机会",
     },
     home: {
       title: "通过",

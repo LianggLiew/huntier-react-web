@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from "react"
-import { Job, JobFilters } from "@/types/job"
+import { Job, JobFilters, transformDbJobToUiJob, JobListingResponse } from "@/types/job"
 import { JobCard } from "./job-card"
 import { JobFiltersPanel } from "./job-filters"
 import { Button } from "@/components/ui/button"
@@ -15,8 +15,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { JobPagination } from "@/components/ui/pagination"
 import { Loader2, SlidersHorizontal, X, Search } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useHeaderVisibility } from "@/hooks/useHeaderVisibility"
 
 interface JobListingProps {
   lang: string
@@ -30,85 +32,51 @@ interface JobListingProps {
   setSortBy?: (sort: string) => void
   showFilters?: boolean
   setShowFilters?: (show: boolean) => void
+  getStickyContainerClasses?: (baseClasses: string, fixedClasses: string) => string
 }
 
-// Sample job data - in a real app, this would come from an API
-const sampleJobs: Job[] = [
-  {
-    id: '1',
-    title: 'Senior Frontend Developer',
-    company: 'TechCorp Inc.',
-    companyLogo: '/api/placeholder/48/48',
-    location: 'San Francisco, CA',
-    type: 'full-time',
-    salary: { min: 120000, max: 180000, currency: '$' },
-    description: 'We are looking for a Senior Frontend Developer to join our growing team. You will be responsible for building user-facing features using React, TypeScript, and modern web technologies.',
-    requirements: ['5+ years React experience', 'TypeScript proficiency', 'Experience with Next.js'],
-    skills: ['React', 'TypeScript', 'Next.js', 'Tailwind CSS', 'GraphQL', 'Jest'],
-    postedDate: new Date('2024-01-15'),
-    applicationDeadline: new Date('2024-02-15'),
-    isRemote: false,
-    experienceLevel: 'senior',
-    category: 'Software Development',
-    benefits: ['Health Insurance', '401k Match', 'Remote Work'],
-    applicationCount: 45,
-    isBookmarked: false
-  },
-  {
-    id: '2',
-    title: 'Product Designer',
-    company: 'DesignTech',
-    location: 'Remote',
-    type: 'full-time',
-    salary: { min: 90000, max: 130000, currency: '$' },
-    description: 'Join our design team to create beautiful and intuitive user experiences. You will work closely with product managers and engineers to design and prototype new features.',
-    requirements: ['3+ years product design experience', 'Figma proficiency', 'User research experience'],
-    skills: ['Figma', 'Sketch', 'Prototyping', 'User Research', 'Design Systems'],
-    postedDate: new Date('2024-01-12'),
-    isRemote: true,
-    experienceLevel: 'mid',
-    category: 'Design',
-    benefits: ['Health Insurance', 'Flexible Hours', 'Learning Budget'],
-    applicationCount: 32,
-    isBookmarked: true
-  },
-  {
-    id: '3',
-    title: 'Data Scientist',
-    company: 'AI Solutions',
-    location: 'New York, NY',
-    type: 'full-time',
-    salary: { min: 140000, max: 200000, currency: '$' },
-    description: 'We are seeking a Data Scientist to help us build ML models and analyze large datasets to drive business insights and product improvements.',
-    requirements: ['PhD in Computer Science or related field', 'Python/R proficiency', 'ML experience'],
-    skills: ['Python', 'R', 'TensorFlow', 'SQL', 'Statistics', 'Machine Learning'],
-    postedDate: new Date('2024-01-10'),
-    isRemote: false,
-    experienceLevel: 'senior',
-    category: 'Data Science',
-    benefits: ['Health Insurance', 'Stock Options', 'Conference Budget'],
-    applicationCount: 28,
-    isBookmarked: false
-  },
-  {
-    id: '4',
-    title: 'Junior Full Stack Developer',
-    company: 'StartupXYZ',
-    location: 'Austin, TX',
-    type: 'full-time',
-    salary: { min: 70000, max: 95000, currency: '$' },
-    description: 'Great opportunity for a junior developer to grow their skills in a fast-paced startup environment. You will work on both frontend and backend development.',
-    requirements: ['1+ years development experience', 'JavaScript proficiency', 'Interest in full stack development'],
-    skills: ['JavaScript', 'Node.js', 'React', 'MongoDB', 'Express.js'],
-    postedDate: new Date('2024-01-08'),
-    isRemote: false,
-    experienceLevel: 'entry',
-    category: 'Software Development',
-    benefits: ['Health Insurance', 'Stock Options', 'Flexible Hours'],
-    applicationCount: 67,
-    isBookmarked: false
+// API function to fetch jobs
+async function fetchJobs(options: {
+  page?: number
+  limit?: number
+  search?: string
+  location?: string
+  employmentTypes?: string[]
+  recruitType?: string
+  salaryMin?: number
+  salaryMax?: number
+  skills?: string[]
+  companyNiche?: string
+}): Promise<JobListingResponse> {
+  const params = new URLSearchParams()
+  
+  Object.entries(options).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      if (Array.isArray(value)) {
+        params.append(key, value.join(','))
+      } else {
+        params.append(key, value.toString())
+      }
+    }
+  })
+  
+  
+  const response = await fetch(`/api/jobs?${params.toString()}`)
+  
+  if (!response.ok) {
+    throw new Error('Failed to fetch jobs')
   }
-]
+  
+  const data = await response.json()
+  
+  // Transform database jobs to UI jobs
+  const transformedJobs = data.jobs.map(transformDbJobToUiJob)
+  
+  return {
+    ...data,
+    jobs: transformedJobs
+  }
+}
 
 const sortOptions = [
   { value: 'recent', label: 'Most Recent' },
@@ -129,10 +97,14 @@ export function JobListing({
   sortBy: externalSortBy,
   setSortBy: setExternalSortBy,
   showFilters: externalShowFilters,
-  setShowFilters: setExternalShowFilters
+  setShowFilters: setExternalShowFilters,
+  getStickyContainerClasses
 }: JobListingProps) {
-  const [jobs, setJobs] = useState<Job[]>([])
+  const [jobsData, setJobsData] = useState<JobListingResponse | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const jobsPerPage = 6
   
   // Use external state if provided, otherwise internal state
   const [internalFilters, setInternalFilters] = useState<JobFilters>({})
@@ -149,82 +121,83 @@ export function JobListing({
   const searchQuery = externalSearchQuery ?? internalSearchQuery
   const setSearchQuery = setExternalSearchQuery ?? setInternalSearchQuery
 
-  // Simulate API loading
+  // Load jobs from API
   useEffect(() => {
     const loadJobs = async () => {
-      setLoading(true)
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      setJobs(sampleJobs)
-      setLoading(false)
+      try {
+        setLoading(true)
+        setError(null)
+        
+        // Convert UI filters to API parameters
+        const employmentTypes = filters.type && filters.type.length > 0 ? filters.type : undefined
+        const salaryMin = filters.salaryRange?.min
+        const salaryMax = filters.salaryRange?.max
+        
+        // Map category to company niche (since category is derived from company.niche)
+        const companyNiche = filters.category
+        
+        
+        const response = await fetchJobs({
+          page: currentPage,
+          limit: jobsPerPage,
+          search: searchQuery || undefined,
+          employmentTypes,
+          salaryMin,
+          salaryMax,
+          companyNiche
+        })
+        
+        setJobsData(response)
+      } catch (err) {
+        console.error('Failed to load jobs:', err)
+        setError('Failed to load jobs. Please try again.')
+      } finally {
+        setLoading(false)
+      }
     }
     
     loadJobs()
-  }, [])
+  }, [currentPage, searchQuery, filters, jobsPerPage])
 
-  // Filter and sort jobs
-  const filteredAndSortedJobs = useMemo(() => {
-    let filteredJobs = jobs.filter(job => {
-      // Search filter (from header search bar)
-      if (searchQuery) {
-        const searchTerm = searchQuery.toLowerCase()
-        const matchesSearch = 
-          job.title.toLowerCase().includes(searchTerm) ||
-          job.company.toLowerCase().includes(searchTerm) ||
-          job.description.toLowerCase().includes(searchTerm) ||
-          job.skills.some(skill => skill.toLowerCase().includes(searchTerm))
-        
-        if (!matchesSearch) return false
-      }
+  // Get jobs and pagination info from API response
+  const jobs = jobsData?.jobs || []
+  const totalJobs = jobsData?.total || 0
+  const totalPages = jobsData ? Math.ceil(jobsData.total / jobsPerPage) : 0
+  const hasMore = jobsData?.hasMore || false
 
-
-
-      // Job type filter
-      if (filters.type && filters.type.length > 0 && !filters.type.includes(job.type)) {
-        return false
-      }
-
-
-      // Category filter
-      if (filters.category && filters.category.length > 0 && 
-          !filters.category.includes(job.category)) {
-        return false
-      }
-
-      // Salary range filter
-      if (filters.salaryRange && job.salary) {
-        const jobMinSalary = job.salary.min
-        const jobMaxSalary = job.salary.max
-        const filterMin = filters.salaryRange.min
-        const filterMax = filters.salaryRange.max
-        
-        if (jobMaxSalary < filterMin || jobMinSalary > filterMax) {
-          return false
+  // Client-side filtering for category (not yet implemented in API)
+  const filteredJobs = useMemo(() => {
+    let filtered = jobs
+    
+    // Category filter (client-side for now)
+    if (filters.category) {
+      filtered = filtered.filter(job => job.category === filters.category)
+    }
+    
+    // Additional client-side sorting if needed
+    if (sortBy && sortBy !== 'recent') {
+      filtered = [...filtered].sort((a, b) => {
+        switch (sortBy) {
+          case 'salary-high':
+            return (b.salary?.max || 0) - (a.salary?.max || 0)
+          case 'salary-low':
+            return (a.salary?.min || 0) - (b.salary?.min || 0)
+          case 'company':
+            return a.companyName.localeCompare(b.companyName)
+          case 'relevant':
+          default:
+            return 0
         }
-      }
+      })
+    }
+    
+    return filtered
+  }, [jobs, filters.category, sortBy])
 
-      return true
-    })
-
-    // Sort jobs
-    filteredJobs.sort((a, b) => {
-      switch (sortBy) {
-        case 'recent':
-          return new Date(b.postedDate).getTime() - new Date(a.postedDate).getTime()
-        case 'salary-high':
-          return (b.salary?.max || 0) - (a.salary?.max || 0)
-        case 'salary-low':
-          return (a.salary?.min || 0) - (b.salary?.min || 0)
-        case 'company':
-          return a.company.localeCompare(b.company)
-        case 'relevant':
-        default:
-          return 0
-      }
-    })
-
-    return filteredJobs
-  }, [jobs, filters, sortBy, searchQuery])
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [filters, sortBy, searchQuery])
 
   const handleJobClick = (jobId: string) => {
     // Navigate to job detail page
@@ -236,8 +209,9 @@ export function JobListing({
     let count = 0
     if (searchQuery) count++
     if (filters.type && filters.type.length > 0) count++
-    if (filters.category && filters.category.length > 0) count++
-    if (filters.salaryRange) count++
+    if (filters.category) count++
+    // Only count salary range if it's been modified from defaults
+    if (filters.salaryRange && (filters.salaryRange.min > 0 || filters.salaryRange.max < 200000)) count++
     return count
   }, [filters, searchQuery])
 
@@ -251,7 +225,7 @@ export function JobListing({
   }
 
 
-  if (loading && !headerOnly) {
+  if (loading && !headerOnly && !jobsData) {
     return (
       <div className="flex items-center justify-center py-12">
         <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
@@ -293,7 +267,7 @@ export function JobListing({
             </Button>
           )}
           <p className="text-gray-600 dark:text-gray-400 hidden sm:block">
-            {filteredAndSortedJobs.length} jobs found
+            {totalJobs} jobs found
           </p>
         </div>
         
@@ -323,7 +297,7 @@ export function JobListing({
         
         {/* Mobile job count */}
         <p className="text-gray-600 dark:text-gray-400 text-sm sm:hidden">
-          {filteredAndSortedJobs.length} jobs found
+          {totalJobs} jobs found
         </p>
       </div>
     )
@@ -332,7 +306,7 @@ export function JobListing({
   // Content only component for main scrollable area
   if (contentOnly) {
     return (
-      <div className="flex relative">
+      <div className="flex relative ">
         {/* Collapsible Filters Sidebar - Sticky positioned */}
         <div 
           className={cn(
@@ -342,7 +316,13 @@ export function JobListing({
               : "w-0 opacity-0 mr-0"
           )}
         >
-          <div className="w-80 sticky top-0 self-start">
+          <div className={getStickyContainerClasses ? 
+            getStickyContainerClasses(
+              "w-80",
+              "fixed top-6 left-6 w-80 z-20"
+            ) : 
+            "w-80 sticky self-start"
+          }>
             <JobFiltersPanel 
               filters={filters}
               onFiltersChange={setFilters}
@@ -389,9 +369,26 @@ export function JobListing({
             showFilters ? "flex-1" : "w-full"
           )}
         >
+          {/* Loading indicator for subsequent loads */}
+          {loading && jobsData && (
+            <div className="flex items-center justify-center py-4">
+              <Loader2 className="w-6 h-6 animate-spin text-emerald-600" />
+              <span className="ml-2 text-sm text-gray-600">Loading jobs...</span>
+            </div>
+          )}
+          
           {/* Job Cards */}
           <div className="space-y-4">
-            {filteredAndSortedJobs.length === 0 ? (
+            {error ? (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <p className="text-red-500 mb-4">{error}</p>
+                  <Button onClick={() => window.location.reload()} variant="outline">
+                    Try Again
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : filteredJobs.length === 0 && !loading ? (
               <Card>
                 <CardContent className="py-12 text-center">
                   <p className="text-gray-500 dark:text-gray-400 mb-4">
@@ -403,20 +400,20 @@ export function JobListing({
                 </CardContent>
               </Card>
             ) : (
-              filteredAndSortedJobs.map((job, index) => (
+              filteredJobs.map((job, index) => (
                 <JobCard
                   key={job.id}
                   id={job.id}
                   title={job.title}
-                  company={job.company}
-                  location={job.location}
+                  company={job.companyName}
+                  location={job.location || ''}
                   salary={job.salary ? `${job.salary.currency}${job.salary.min.toLocaleString()} - ${job.salary.currency}${job.salary.max.toLocaleString()}` : 'Salary not specified'}
-                  postedDate={job.postedDate.toLocaleDateString()}
-                  description={job.description}
+                  postedDate={job.postedDate}
+                  description={job.description || ''}
                   skills={job.skills}
                   matchPercentage={Math.floor(Math.random() * 30) + 70} // Mock match percentage
                   isRemote={job.isRemote}
-                  isHybrid={!job.isRemote && job.location.toLowerCase().includes('hybrid')}
+                  isHybrid={!job.isRemote && (job.location || '').toLowerCase().includes('hybrid')}
                   animationDelay={index % 4}
                   logo={job.companyLogo}
                   lang={lang}
@@ -425,13 +422,13 @@ export function JobListing({
             )}
           </div>
 
-          {/* Load More Button */}
-          {filteredAndSortedJobs.length > 0 && (
-            <div className="mt-8 text-center">
-              <Button variant="outline" size="lg">
-                Load More Jobs
-              </Button>
-            </div>
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <JobPagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
           )}
         </div>
       </div>

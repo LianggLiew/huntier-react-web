@@ -12,7 +12,7 @@ import {
   Filter, 
   X 
 } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
 
 interface JobFiltersProps {
@@ -26,6 +26,11 @@ interface JobFiltersProps {
 export function JobFiltersPanel({ filters, onFiltersChange, onClearFilters, onClose, isMobile }: JobFiltersProps) {
   const [localFilters, setLocalFilters] = useState<JobFilters>(filters)
 
+  // Sync local filters when external filters change (e.g., when cleared)
+  useEffect(() => {
+    setLocalFilters(filters)
+  }, [filters])
+
   const jobTypes = [
     { value: 'full-time', label: 'Full Time' },
     { value: 'part-time', label: 'Part Time' },
@@ -35,14 +40,13 @@ export function JobFiltersPanel({ filters, onFiltersChange, onClearFilters, onCl
 
 
   const categories = [
-    'Software Development',
-    'Data Science',
-    'Design',
-    'Marketing',
-    'Sales',
-    'Product Management',
-    'DevOps',
-    'Quality Assurance'
+    'Enterprise Software',
+    'Design & UX',
+    'AI/ML',
+    'Mobile Development',
+    'Cloud Computing',
+    'Data Analytics',
+    'QA/Testing'
   ]
 
   const handleFilterChange = (key: keyof JobFilters, value: any) => {
@@ -61,11 +65,8 @@ export function JobFiltersPanel({ filters, onFiltersChange, onClearFilters, onCl
 
 
   const handleCategoryChange = (category: string, checked: boolean) => {
-    const currentCategories = localFilters.category || []
-    const updatedCategories = checked 
-      ? [...currentCategories, category]
-      : currentCategories.filter(c => c !== category)
-    handleFilterChange('category', updatedCategories)
+    const updatedCategory = checked ? category : undefined
+    handleFilterChange('category', updatedCategory)
   }
 
   const hasActiveFilters = Object.values(localFilters).some(value => 
@@ -74,7 +75,7 @@ export function JobFiltersPanel({ filters, onFiltersChange, onClearFilters, onCl
   )
 
   return (
-    <div className={cn("space-y-6", isMobile ? "w-full" : "w-80")}>
+    <div className={cn("space-y-6", isMobile ? "w-full" : "w-80", "fixed top-44")}>
       <Card className="max-h-[calc(100vh-16rem)] overflow-y-auto">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
@@ -134,7 +135,7 @@ export function JobFiltersPanel({ filters, onFiltersChange, onClearFilters, onCl
             <Label className="text-sm font-medium">Salary Range (USD)</Label>
             <div className="px-2">
               <Slider
-                defaultValue={[localFilters.salaryRange?.min || 0, localFilters.salaryRange?.max || 200000]}
+                value={[localFilters.salaryRange?.min || 0, localFilters.salaryRange?.max || 200000]}
                 max={200000}
                 min={0}
                 step={5000}
@@ -160,7 +161,7 @@ export function JobFiltersPanel({ filters, onFiltersChange, onClearFilters, onCl
                 <div key={category} className="flex items-center space-x-2">
                   <Checkbox
                     id={category}
-                    checked={localFilters.category?.includes(category) || false}
+                    checked={localFilters.category === category || false}
                     onCheckedChange={(checked) => handleCategoryChange(category, checked as boolean)}
                   />
                   <Label htmlFor={category} className="text-sm">

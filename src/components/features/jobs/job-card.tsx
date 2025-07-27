@@ -4,6 +4,7 @@ import { MapPin, Sparkles, Clock, Bookmark } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
+import { getRelativeTime } from "@/lib/utils"
 
 type JobCardProps = {
   id: string
@@ -11,7 +12,7 @@ type JobCardProps = {
   company: string
   location: string
   salary: string
-  postedDate: string
+  postedDate: Date
   description: string
   skills: string[]
   matchPercentage: number
@@ -88,11 +89,11 @@ export function JobCard({
                 <MapPin className="h-3.5 w-3.5" />
                 <span>{locationText}</span>
               </div>
+              <div className="font-medium text-emerald-600 dark:text-emerald-400">{salary}</div>
               <div className="flex items-center gap-1">
                 <Clock className="h-3.5 w-3.5" />
-                <span>{postedDate?.replace('Posted ', '') || postedDate || 'Recently'}</span>
+                <span>{getRelativeTime(postedDate)}</span>
               </div>
-              <div className="font-medium text-emerald-600 dark:text-emerald-400">{salary}</div>
             </div>
             
             
