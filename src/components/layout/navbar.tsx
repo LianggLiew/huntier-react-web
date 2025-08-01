@@ -7,35 +7,18 @@ import { ThemeToggle } from "@/components/shared/theme-toggle"
 import { LanguageToggle } from "@/components/shared/language-toggle"
 import { NavClient } from "@/components/layout/nav-client"
 import { NotificationBell } from "@/components/shared/notification-bell"
-import { useTranslation } from "@/hooks/use-translations"
 import { useScrollDirection } from "@/hooks/useScrollDirection"
+import { useAuth } from "@/hooks/useAuth"
 import { cn } from "@/lib/utils"
 
 interface NavbarProps {
   lang: string
+  dictionary: any
 }
 
-export function Navbar({ lang }: NavbarProps) {
-  const { translation: coreTranslations, loading } = useTranslation('core', lang)
+export function Navbar({ lang, dictionary }: NavbarProps) {
   const { scrollDirection, isAtTop } = useScrollDirection()
-
-  // Show loading skeleton while translations load
-  if (loading) {
-    return (
-      <header className="fixed top-0 z-50 w-full border-b bg-background/95 backdrop-blur-sm">
-        <div className="container max-w-7xl mx-auto px-4 sm:px-6 flex h-16 items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="h-6 w-6 bg-muted animate-pulse rounded"></div>
-            <div className="h-6 w-20 bg-muted animate-pulse rounded"></div>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="h-8 w-8 bg-muted animate-pulse rounded"></div>
-            <div className="h-8 w-16 bg-muted animate-pulse rounded"></div>
-          </div>
-        </div>
-      </header>
-    )
-  }
+  const { isAuthenticated, logout } = useAuth()
 
   // Sample notifications for demo purposes
   const sampleNotifications = [
@@ -63,8 +46,8 @@ export function Navbar({ lang }: NavbarProps) {
   ]
 
   const navItems = [
-    { name: coreTranslations.navbar?.resources || 'Resources', href: `/${lang}/resources` },
-    { name: coreTranslations.navbar?.about || 'About', href: `/${lang}/about` },
+    { name: dictionary.navbar?.resources || 'Resources', href: `/${lang}/resources` },
+    { name: dictionary.navbar?.about || 'About', href: `/${lang}/about` },
   ]
 
   return (
@@ -87,22 +70,32 @@ export function Navbar({ lang }: NavbarProps) {
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-emerald-500 group-hover:w-full transition-all duration-300"></span>
             </span>
           </Link>
-          <NavClient lang={lang} navItems={navItems} myProfileText={coreTranslations.navbar?.myProfile || 'My Profile'} />
+          <NavClient lang={lang} navItems={navItems} myProfileText={dictionary.navbar?.myProfile || 'My Profile'} />
         </div>
         <div className="flex items-center gap-4">
           <ThemeToggle />
           <LanguageToggle
             lang={lang}
             translations={{
-              english: coreTranslations.languageToggle?.english || 'English',
-              chinese: coreTranslations.languageToggle?.chinese || '中文',
+              english: dictionary.languageToggle?.english || 'English',
+              chinese: dictionary.languageToggle?.chinese || '中文',
             }}
           />
           <NotificationBell notifications={sampleNotifications} />
+          {isAuthenticated && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => logout()} 
+              className="ml-2"
+            >
+              Logout
+            </Button>
+          )}
           <Button asChild variant="ghost" size="icon" className="rounded-full h-9 w-9 hidden md:flex hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all duration-300 hover:scale-110">
-            <Link href={`/${lang}/profile`}>
+            <Link href={isAuthenticated ? `/${lang}/profile` : `/${lang}/verify-otp`}>
               <User className="h-[1.2rem] w-[1.2rem] text-emerald-600 dark:text-emerald-400" />
-              <span className="sr-only">Profile</span>
+              <span className="sr-only">{isAuthenticated ? 'Profile' : 'Sign In'}</span>
             </Link>
           </Button>
         </div>

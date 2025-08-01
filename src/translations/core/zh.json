@@ -7,10 +7,32 @@
     "myProfile": "我的简历"
   },
   "footer": {
+    "description": "AI 驱动的求职匹配平台，连接优秀专业人士与理想工作机会。",
+    "services": "服务",
+    "jobSearch": "求职搜索",
+    "careerGuidance": "职业指导",
+    "skillAssessment": "技能评估",
+    "resumeBuilder": "简历构建器",
+    "company": "公司",
+    "aboutUs": "关于我们",
+    "careers": "招聘",
+    "press": "新闻",
+    "blog": "博客",
+    "legal": "法律",
     "termsOfService": "服务条款",
     "privacy": "隐私政策",
     "cookies": "Cookie 政策",
-    "copyright": "© {year} Huntier Inc. 保留所有权利。"
+    "licensing": "许可证",
+    "copyright": "© {year} Huntier Inc. 保留所有权利。",
+    "sitemap": "网站地图",
+    "accessibility": "无障碍访问",
+    "doNotSell": "不出售我的信息",
+    "social": {
+      "twitter": "推特",
+      "linkedin": "领英",
+      "instagram": "Instagram",
+      "github": "GitHub"
+    }
   },
   "languageToggle": {
     "english": "English",

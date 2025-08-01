@@ -1,4 +1,4 @@
-import { getDictionary } from "@/lib/dictionary";
+import { getDictionaryAsync } from "@/lib/dictionary";
 import { 
   BriefcaseBusiness, 
   Briefcase, 
@@ -21,16 +21,17 @@ import Link from "next/link";
 import Image from "next/image";
 import { AnimatedBackground } from "@/components/shared/animated-background";
 import { Navbar } from "@/components/layout/navbar";
+import { ProfileButton } from "@/components/home/ProfileButton";
 
 export default async function LocaleHomePage({ params }: { params: Promise<{ lang: string }> | { lang: string } }) {
   // Await the params if it's a promise
   const resolvedParams = await params;
   const lang = resolvedParams.lang;
-  const dictionary = getDictionary(lang);
+  const dictionary = await getDictionaryAsync(lang);
   
   return (
     <>
-      <Navbar lang={lang} />
+      <Navbar lang={lang} dictionary={dictionary} />
       <div className="pt-16">
       {/* Add a prominent link to the onboarding flow */}
       <div className="fixed bottom-10 right-10 z-50">
@@ -99,12 +100,7 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ lan
                     <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" className="rounded-full border-2 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-all px-8 py-6 text-lg group border-emerald-200 dark:border-emerald-800" asChild>
-                  <Link href={`/${lang}/profile`} className="flex items-center gap-2">
-                    {dictionary.home.viewProfileButton}
-                    <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </Link>
-                </Button>
+                <ProfileButton lang={lang} dictionary={dictionary} />
               </div>
               
               {/* Early access community */}

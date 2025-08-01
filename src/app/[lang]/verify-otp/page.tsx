@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
 import { Mail, Phone, ChevronDown, Sparkles, Check } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -10,12 +9,20 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { AnimatedBackground } from '@/components/shared/animated-background';
-import { getDictionary } from '@/lib/dictionary';
+import { getDictionaryAsync } from '@/lib/dictionary';
+import { useAuth } from '@/hooks/useAuth';
+import { useNavigation } from '@/hooks/useNavigation';
+import { type LocalizedPageProps } from '@/lib/navigation';
+import { ApiResponse, OTPVerificationResponse } from '@/types/interface-contracts';
 
-export default function VerifyOTPPage({ params }: { params: Promise<{ lang: string }> | { lang: string } }) {
-  const router = useRouter();
+export default function VerifyOTPPage({ params }: LocalizedPageProps) {
   const { toast } = useToast();
-  const [lang, setLang] = useState('en');
+  const { login } = useAuth();
+  const { push, lang, isReady } = useNavigation(params);
+  
+  // State for dictionary
+  const [dictionary, setDictionary] = useState<any>({});
+  const [dictionaryLoading, setDictionaryLoading] = useState(true);
   
   // State for verification type (email/phone)
   const [verificationType, setVerificationType] = useState<'email' | 'phone'>('phone');
@@ -62,16 +69,19 @@ export default function VerifyOTPPage({ params }: { params: Promise<{ lang: stri
     { code: '+886', name: 'Taiwan', flag: '🇹🇼' },
   ];
 
-  // Initialize language
+  // Load dictionary
   useEffect(() => {
-    const initializeComponent = async () => {
-      const resolvedParams = await params;
-      setLang(resolvedParams.lang);
-    };
-    initializeComponent();
-  }, [params]);
-
-  const dictionary = getDictionary(lang);
+    if (lang) {
+      setDictionaryLoading(true);
+      getDictionaryAsync(lang)
+        .then(setDictionary)
+        .catch(error => {
+          console.error('Failed to load dictionary:', error);
+          setDictionary({});
+        })
+        .finally(() => setDictionaryLoading(false));
+    }
+  }, [lang]);
   
   // Toggle between email and phone verification
   const toggleVerificationType = () => {
@@ -216,6 +226,7 @@ export default function VerifyOTPPage({ params }: { params: Promise<{ lang: stri
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Important for cookies
         body: JSON.stringify({
           contactValue: verificationType === 'phone' ? `${selectedCountry.code}${contactValue}` : contactValue,
           contactType: verificationType,
@@ -223,64 +234,93 @@ export default function VerifyOTPPage({ params }: { params: Promise<{ lang: stri
         }),
       });
 
-      const data = await response.json();
+      const result: ApiResponse<OTPVerificationResponse> = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to verify OTP');
+      if (response.ok && result.success && result.data) {
+        // Login successful - use auth context
+        await login(result.data.sessionToken, result.data.user);
+        
+        toast({ 
+          title: dictionary.verifyOtp.errors.verificationSuccessful, 
+          description: dictionary.verifyOtp.errors.verificationSuccessfulDescription 
+        });
+
+        // Redirect based on API response using localized navigation
+        const destination = result.data.redirectTo || 'jobs';
+        // Remove leading slash if present since push() handles localization
+        const cleanDestination = destination.startsWith('/') ? destination.slice(1) : destination;
+        push(cleanDestination);
+      } else {
+        // Handle specific error cases
+        if (result.data?.blacklisted) {
+          toast({ 
+            title: dictionary.verifyOtp.errors.accessRestricted, 
+            description: dictionary.verifyOtp.errors.accessRestrictedDescription, 
+            variant: 'destructive' 
+          });
+          // Reset the form since they're blacklisted
+          setIsOtpSent(false);
+          setOtpValue('');
+          setCountdown(60);
+        } else {
+          const errorMessage = result.error || result.data?.error || 'Failed to verify OTP';
+          
+          if (errorMessage.includes('attempts')) {
+            toast({ 
+              title: dictionary.verifyOtp.errors.accountLocked, 
+              description: dictionary.verifyOtp.errors.accountLockedDescription, 
+              variant: 'destructive' 
+            });
+            // Reset the form
+            setIsOtpSent(false);
+            setOtpValue('');
+            setCountdown(60);
+          } else if (errorMessage.includes('expired')) {
+            toast({ 
+              title: dictionary.verifyOtp.errors.codeExpired, 
+              description: dictionary.verifyOtp.errors.codeExpiredDescription, 
+              variant: 'destructive' 
+            });
+            setIsOtpSent(false);
+            setOtpValue('');
+            setCountdown(60);
+          } else {
+            toast({ 
+              title: dictionary.verifyOtp.errors.verificationFailed, 
+              description: errorMessage, 
+              variant: 'destructive' 
+            });
+            // Clear OTP input for retry
+            setOtpValue('');
+          }
+        }
       }
-      
-      toast({ 
-        title: dictionary.verifyOtp.errors.verificationSuccessful, 
-        description: dictionary.verifyOtp.errors.verificationSuccessfulDescription 
-      });
-      router.push('/');
     } catch (error: any) {
       console.error('Verify OTP error:', error);
-      
-      // Handle different error types
-      if (error.message.includes('blacklist')) {
-        toast({ 
-          title: dictionary.verifyOtp.errors.accessRestricted, 
-          description: dictionary.verifyOtp.errors.accessRestrictedDescription, 
-          variant: 'destructive' 
-        });
-        // Reset the form since they're blacklisted
-        setIsOtpSent(false);
-        setOtpValue('');
-        setCountdown(60);
-      } else if (error.message.includes('attempts')) {
-        toast({ 
-          title: dictionary.verifyOtp.errors.accountLocked, 
-          description: dictionary.verifyOtp.errors.accountLockedDescription, 
-          variant: 'destructive' 
-        });
-        // Reset the form
-        setIsOtpSent(false);
-        setOtpValue('');
-        setCountdown(60);
-      } else if (error.message.includes('expired')) {
-        toast({ 
-          title: dictionary.verifyOtp.errors.codeExpired, 
-          description: dictionary.verifyOtp.errors.codeExpiredDescription, 
-          variant: 'destructive' 
-        });
-        setIsOtpSent(false);
-        setOtpValue('');
-        setCountdown(60);
-      } else {
-        toast({ 
-          title: dictionary.verifyOtp.errors.verificationFailed, 
-          description: error.message || dictionary.verifyOtp.errors.verificationFailedDescription, 
-          variant: 'destructive' 
-        });
-        // Clear OTP input for retry
-        setOtpValue('');
-      }
+      toast({ 
+        title: dictionary.verifyOtp.errors.verificationFailed, 
+        description: 'Network error. Please try again.', 
+        variant: 'destructive' 
+      });
+      // Clear OTP input for retry
+      setOtpValue('');
     } finally {
       setIsLoading(false);
     }
   };
   
+  // Show loading state while navigation initializes or dictionary loads
+  if (!isReady || dictionaryLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-background via-background to-emerald-50/40 dark:from-background dark:via-background dark:to-emerald-950/30 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600 mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-emerald-50/40 dark:from-background dark:via-background dark:to-emerald-950/30 relative overflow-hidden">
       {/* Background elements matching the hero section */}

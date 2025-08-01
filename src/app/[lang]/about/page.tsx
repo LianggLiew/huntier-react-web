@@ -2,7 +2,7 @@ import Link from "next/link"
 import { ArrowRight, Award, Brain, CheckCircle, ChevronRight, Globe, HeartHandshake, Lightbulb, Sparkles, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { getDictionary } from "@/lib/dictionary"
+import { getDictionaryAsync } from "@/lib/dictionary"
 import { Navbar } from "@/components/layout/navbar"
 
 // Sample team data with bilingual roles
@@ -113,11 +113,13 @@ export default async function AboutPage({ params }: { params: Promise<{ lang: st
   // Await the params if it's a promise
   const resolvedParams = await params;
   const lang = resolvedParams.lang;
-  const dictionary = await getDictionary(lang);
+  const dictionary = await getDictionaryAsync(lang);
   
   return (
     <>
-      <section className="w-full py-16 md:py-28 lg:py-32 bg-gradient-to-br from-emerald-50/80 via-white to-emerald-50/40 dark:from-emerald-950/20 dark:via-gray-950 dark:to-emerald-950/10 relative overflow-hidden">
+      <Navbar lang={lang} dictionary={dictionary} />
+      <div className="pt-16">
+        <section className="w-full py-16 md:py-28 lg:py-32 bg-gradient-to-br from-emerald-50/80 via-white to-emerald-50/40 dark:from-emerald-950/20 dark:via-gray-950 dark:to-emerald-950/10 relative overflow-hidden">
         {/* Decorative background elements */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-br from-emerald-200/20 to-transparent dark:from-emerald-800/10 rounded-full blur-3xl transform -translate-y-1/2"></div>
@@ -489,6 +491,7 @@ export default async function AboutPage({ params }: { params: Promise<{ lang: st
           </div>
         </div>
       </section>
+      </div>
     </>
   )
 }

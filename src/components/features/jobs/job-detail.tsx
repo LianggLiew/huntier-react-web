@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Job, transformDbJobToUiJob } from "@/types/job"
+import { ApplicationStatus } from "@/types/job-application"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -16,13 +17,21 @@ import {
   BookmarkCheck,
   ArrowLeft,
   ExternalLink,
-  GraduationCap
+  GraduationCap,
+  CheckCircle,
+  Eye,
+  Clock3,
+  UserCheck,
+  XCircle
 } from "lucide-react"
 import { cn, getRelativeTime } from "@/lib/utils"
 import Link from "next/link"
+import { useAuth } from "@/hooks/useAuth"
+import { useJobApplication } from "@/hooks/useJobApplication"
 import { BenefitsCard } from "./benefits-card"
 import { CompanyInfoCard } from "./company-info-card"
 import { JobMetaCard } from "./job-meta-card"
+import { ApplicationModal } from "./ApplicationModal"
 import { useHeaderVisibility } from "@/hooks/useHeaderVisibility"
 
 interface JobDetailProps {
@@ -36,7 +45,11 @@ export function JobDetail({ jobId, lang }: JobDetailProps) {
   const [job, setJob] = useState<Job | null>(null)
   const [loading, setLoading] = useState(true)
   const [isBookmarked, setIsBookmarked] = useState(false)
+  const [applicationStatus, setApplicationStatus] = useState<ApplicationStatus | null>(null)
+  const [isApplicationModalOpen, setIsApplicationModalOpen] = useState(false)
   
+  const { isAuthenticated } = useAuth()
+  const { checkApplicationStatus, isCheckingStatus } = useJobApplication()
   const { headerRef, getStickyContainerClasses } = useHeaderVisibility({
     dependencies: [job]
   })
@@ -63,6 +76,12 @@ export function JobDetail({ jobId, lang }: JobDetailProps) {
         
         setJob(uiJob)
         setIsBookmarked(uiJob.isBookmarked || false)
+        
+        // Check application status if user is authenticated
+        if (isAuthenticated) {
+          const status = await checkApplicationStatus(parseInt(jobId))
+          setApplicationStatus(status)
+        }
       } catch (error) {
         console.error('Error fetching job:', error)
         setJob(null)
@@ -72,10 +91,102 @@ export function JobDetail({ jobId, lang }: JobDetailProps) {
     }
 
     fetchJob()
-  }, [jobId])
+  }, [jobId, isAuthenticated, checkApplicationStatus])
 
   const handleBookmark = () => {
     setIsBookmarked(!isBookmarked)
+  }
+
+  const handleApplyClick = () => {
+    if (!isAuthenticated) {
+      // Redirect to login - you can customize this based on your auth flow
+      window.location.href = `/${lang}/verify-otp`
+      return
+    }
+    
+    if (applicationStatus === null) {
+      setIsApplicationModalOpen(true)
+    }
+  }
+
+  const handleApplicationSuccess = () => {
+    // Refresh application status after successful submission
+    if (isAuthenticated) {
+      checkApplicationStatus(parseInt(jobId)).then(setApplicationStatus)
+    }
+  }
+
+  const getApplicationButtonContent = () => {
+    if (!isAuthenticated) {
+      return {
+        text: 'Apply Now',
+        icon: null,
+        variant: 'default' as const,
+        disabled: false,
+        className: 'bg-emerald-600 hover:bg-emerald-700 text-white'
+      }
+    }
+
+    if (isCheckingStatus) {
+      return {
+        text: 'Checking...',
+        icon: <Clock3 className="w-4 h-4 mr-2" />,
+        variant: 'outline' as const,
+        disabled: true,
+        className: ''
+      }
+    }
+
+    switch (applicationStatus) {
+      case 'pending':
+        return {
+          text: 'Applied - Pending',
+          icon: <Clock3 className="w-4 h-4 mr-2" />,
+          variant: 'outline' as const,
+          disabled: true,
+          className: 'border-yellow-500 text-yellow-600 bg-yellow-50 dark:bg-yellow-900/20'
+        }
+      case 'reviewing':
+        return {
+          text: 'Under Review',
+          icon: <Eye className="w-4 h-4 mr-2" />,
+          variant: 'outline' as const,
+          disabled: true,
+          className: 'border-blue-500 text-blue-600 bg-blue-50 dark:bg-blue-900/20'
+        }
+      case 'interviewed':
+        return {
+          text: 'Interviewed',
+          icon: <UserCheck className="w-4 h-4 mr-2" />,
+          variant: 'outline' as const,
+          disabled: true,
+          className: 'border-purple-500 text-purple-600 bg-purple-50 dark:bg-purple-900/20'
+        }
+      case 'accepted':
+        return {
+          text: 'Congratulations!',
+          icon: <CheckCircle className="w-4 h-4 mr-2" />,
+          variant: 'outline' as const,
+          disabled: true,
+          className: 'border-emerald-500 text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20'
+        }
+      case 'rejected':
+        return {
+          text: 'Not Selected',
+          icon: <XCircle className="w-4 h-4 mr-2" />,
+          variant: 'outline' as const,
+          disabled: true,
+          className: 'border-red-500 text-red-600 bg-red-50 dark:bg-red-900/20'
+        }
+      default:
+        return {
+          text: 'Apply Now',
+          icon: null,
+          variant: 'default' as const,
+          disabled: false,
+          className: 'bg-emerald-600 hover:bg-emerald-700 text-white'
+        }
+    }
   }
 
   const formatSalary = (salaryMin?: number, salaryMax?: number) => {
@@ -212,8 +323,14 @@ export function JobDetail({ jobId, lang }: JobDetailProps) {
                       <Bookmark className="w-5 h-5" />
                     )}
                   </Button>
-                  <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
-                    Apply Now
+                  <Button 
+                    variant={getApplicationButtonContent().variant}
+                    className={getApplicationButtonContent().className}
+                    onClick={handleApplyClick}
+                    disabled={getApplicationButtonContent().disabled}
+                  >
+                    {getApplicationButtonContent().icon}
+                    {getApplicationButtonContent().text}
                   </Button>
                 </div>
               </div>
@@ -367,6 +484,19 @@ export function JobDetail({ jobId, lang }: JobDetailProps) {
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* Application Modal */}
+      {job && (
+        <ApplicationModal
+          isOpen={isApplicationModalOpen}
+          onClose={() => setIsApplicationModalOpen(false)}
+          jobId={parseInt(jobId)}
+          jobTitle={job.title}
+          companyName={job.company?.name || job.companyName}
+          location={job.location}
+          onSuccess={handleApplicationSuccess}
+        />
       )}
     </div>
   )

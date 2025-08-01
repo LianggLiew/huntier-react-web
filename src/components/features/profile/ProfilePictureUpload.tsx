@@ -4,23 +4,38 @@ import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar } from '@/components/ui/avatar';
 import { Card } from '@/components/ui/card';
-import { Camera, Upload, X, Check } from 'lucide-react';
+import { Camera, Upload, X, Check, Loader2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useToast } from '@/hooks/use-toast';
 
 interface ProfilePictureUploadProps {
   currentImage?: string;
   userName: string;
-  onImageSave: (imageData: string) => void;
+  onImageSave: (imageUrl: string) => void;
 }
 
 export function ProfilePictureUpload({ currentImage, userName, onImageSave }: ProfilePictureUploadProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
   const handleFileChange = (file: File) => {
     if (file && file.type.startsWith('image/')) {
+      // Validate file size (5MB max)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: 'File too large',
+          description: 'Please select an image smaller than 5MB.',
+          variant: 'destructive'
+        });
+        return;
+      }
+
+      setSelectedFile(file);
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result as string;
@@ -51,18 +66,50 @@ export function ProfilePictureUpload({ currentImage, userName, onImageSave }: Pr
     setDragOver(false);
   };
 
-  const handleSave = () => {
-    if (selectedImage) {
-      onImageSave(selectedImage);
-      // Save to localStorage
-      localStorage.setItem('userProfileImage', selectedImage);
-      setIsEditing(false);
-      setSelectedImage(null);
+  const handleSave = async () => {
+    if (!selectedFile) return;
+
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+
+      const response = await fetch('/api/avatar/upload', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        onImageSave(result.data.avatarUrl);
+        setIsEditing(false);
+        setSelectedImage(null);
+        setSelectedFile(null);
+        
+        toast({
+          title: 'Profile picture updated',
+          description: 'Your avatar has been successfully updated.'
+        });
+      } else {
+        throw new Error(result.error || 'Failed to upload avatar');
+      }
+    } catch (error) {
+      console.error('Avatar upload error:', error);
+      toast({
+        title: 'Upload failed',
+        description: error instanceof Error ? error.message : 'Failed to upload avatar. Please try again.',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsUploading(false);
     }
   };
 
   const handleCancel = () => {
     setSelectedImage(null);
+    setSelectedFile(null);
     setIsEditing(false);
   };
 
@@ -184,11 +231,20 @@ export function ProfilePictureUpload({ currentImage, userName, onImageSave }: Pr
               </Button>
               <Button 
                 onClick={handleSave}
-                disabled={!selectedImage}
+                disabled={!selectedFile || isUploading}
                 className="flex-1 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Check size={16} className="mr-2" />
-                Save Photo
+                {isUploading ? (
+                  <>
+                    <Loader2 size={16} className="mr-2 animate-spin" />
+                    Uploading...
+                  </>
+                ) : (
+                  <>
+                    <Check size={16} className="mr-2" />
+                    Save Photo
+                  </>
+                )}
               </Button>
             </div>
           </div>

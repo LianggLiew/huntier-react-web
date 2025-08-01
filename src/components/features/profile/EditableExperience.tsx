@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -12,6 +13,7 @@ interface Experience {
   company: string;
   period: string;
   description: string;
+  isEmpty?: boolean;
 }
 
 interface EditableExperienceProps {
@@ -23,6 +25,21 @@ interface EditableExperienceProps {
 export function EditableExperience({ initialExperience, onSave, dictionary }: EditableExperienceProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [experience, setExperience] = useState<Experience[]>(initialExperience);
+
+  // Update local state when initialExperience prop changes
+  React.useEffect(() => {
+    if (!isEditing) {
+      setExperience(initialExperience);
+    }
+  }, [initialExperience, isEditing]);
+
+  const handleEditStart = () => {
+    // If we have empty state templates, start with a clean empty entry
+    if (initialExperience.length === 1 && initialExperience[0].isEmpty) {
+      setExperience([{ title: '', company: '', period: '', description: '' }]);
+    }
+    setIsEditing(true);
+  };
 
   const handleSave = () => {
     // Validate that all required fields are filled
@@ -70,7 +87,7 @@ export function EditableExperience({ initialExperience, onSave, dictionary }: Ed
             <Button 
               size="sm" 
               className="h-7 px-2 text-xs bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600"
-              onClick={() => setIsEditing(true)}
+              onClick={handleEditStart}
             >
               <Edit size={12} className="mr-1" />
               {dictionary?.profile?.buttons?.edit || 'Edit'}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
@@ -11,6 +12,7 @@ import { Edit, Save, X, Plus, Trash2 } from 'lucide-react';
 interface Skill {
   name: string;
   proficiency: number;
+  isEmpty?: boolean;
 }
 
 interface EditableSkillsProps {
@@ -23,8 +25,25 @@ export function EditableSkills({ initialSkills, onSave, dictionary }: EditableSk
   const [isEditing, setIsEditing] = useState(false);
   const [skills, setSkills] = useState<Skill[]>(initialSkills);
 
+  // Update local state when initialSkills prop changes
+  React.useEffect(() => {
+    if (!isEditing) {
+      setSkills(initialSkills);
+    }
+  }, [initialSkills, isEditing]);
+
+  const handleEditStart = () => {
+    // If we have empty state templates, start with a clean empty entry
+    if (initialSkills.length === 1 && initialSkills[0].isEmpty) {
+      setSkills([{ name: '', proficiency: 50 }]);
+    }
+    setIsEditing(true);
+  };
+
   const handleSave = () => {
-    onSave(skills);
+    // Filter out skills that have empty names
+    const validSkills = skills.filter(skill => skill.name.trim() !== '');
+    onSave(validSkills);
     setIsEditing(false);
   };
 
@@ -60,7 +79,7 @@ export function EditableSkills({ initialSkills, onSave, dictionary }: EditableSk
             <Button 
               size="sm" 
               className="h-7 px-2 text-xs bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600"
-              onClick={() => setIsEditing(true)}
+              onClick={handleEditStart}
             >
               <Edit size={12} className="mr-1" />
               {dictionary?.profile?.buttons?.edit || 'Edit'}

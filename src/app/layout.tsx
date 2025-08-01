@@ -5,6 +5,7 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/shared/theme-provider"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { Analytics } from "@vercel/analytics/next"
+import { ClientProviders } from "@/components/providers/ClientProviders"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -24,8 +25,10 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <TooltipProvider>
-            {children}
-            <Analytics />
+            <ClientProviders>
+              {children}
+              <Analytics />
+            </ClientProviders>
           </TooltipProvider>
         </ThemeProvider>
       </body>

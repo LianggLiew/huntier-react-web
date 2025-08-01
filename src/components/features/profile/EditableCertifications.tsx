@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
@@ -10,6 +11,7 @@ interface Certification {
   name: string;
   issuer: string;
   year: string;
+  isEmpty?: boolean;
 }
 
 interface EditableCertificationsProps {
@@ -22,8 +24,38 @@ export function EditableCertifications({ initialCertifications, onSave, dictiona
   const [isEditing, setIsEditing] = useState(false);
   const [certifications, setCertifications] = useState<Certification[]>(initialCertifications);
 
+  // Update local state when initialCertifications prop changes
+  React.useEffect(() => {
+    if (!isEditing) {
+      setCertifications(initialCertifications);
+    }
+  }, [initialCertifications, isEditing]);
+
+  const handleEditStart = () => {
+    // If we have empty state templates, start with a clean empty entry
+    if (initialCertifications.length === 1 && initialCertifications[0].isEmpty) {
+      setCertifications([{ name: '', issuer: '', year: '' }]);
+    }
+    setIsEditing(true);
+  };
+
   const handleSave = () => {
-    onSave(certifications);
+    // Check if all certifications have required fields filled
+    const hasEmptyFields = certifications.some(cert => 
+      !cert.name.trim() || !cert.issuer.trim() || !cert.year.trim()
+    );
+    
+    if (hasEmptyFields) {
+      // Don't save if there are empty required fields
+      return;
+    }
+    
+    // Filter out certifications that have empty required fields (as backup)
+    const validCertifications = certifications.filter(cert => 
+      cert.name.trim() && cert.issuer.trim() && cert.year.trim()
+    );
+    
+    onSave(validCertifications);
     setIsEditing(false);
   };
 
@@ -47,6 +79,16 @@ export function EditableCertifications({ initialCertifications, onSave, dictiona
     setCertifications(updated);
   };
 
+  const isFieldEmpty = (cert: Certification, field: keyof Certification) => {
+    return !cert[field] || (cert[field] as string).trim() === '';
+  };
+
+  const hasEmptyRequiredFields = () => {
+    return certifications.some(cert => 
+      isFieldEmpty(cert, 'name') || isFieldEmpty(cert, 'issuer') || isFieldEmpty(cert, 'year')
+    );
+  };
+
   return (
     <Card className="bg-gray-900 border-gray-800 hover:border-emerald-500/50 transition-all duration-200 shadow-lg hover:shadow-emerald-500/10">
       <div className="p-6">
@@ -59,7 +101,7 @@ export function EditableCertifications({ initialCertifications, onSave, dictiona
             <Button 
               size="sm" 
               className="h-7 px-2 text-xs bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600"
-              onClick={() => setIsEditing(true)}
+              onClick={handleEditStart}
             >
               <Edit size={12} className="mr-1" />
               {dictionary?.profile?.buttons?.edit || 'Edit'}
@@ -68,8 +110,13 @@ export function EditableCertifications({ initialCertifications, onSave, dictiona
             <div className="flex gap-2">
               <Button 
                 size="sm" 
-                className="h-7 px-2 text-xs bg-emerald-600 hover:bg-emerald-700"
+                className={`h-7 px-2 text-xs ${
+                  hasEmptyRequiredFields() 
+                    ? 'bg-gray-600 cursor-not-allowed opacity-50' 
+                    : 'bg-emerald-600 hover:bg-emerald-700'
+                }`}
                 onClick={handleSave}
+                disabled={hasEmptyRequiredFields()}
               >
                 <Save size={12} className="mr-1" />
                 {dictionary?.profile?.buttons?.save || 'Save'}
@@ -105,7 +152,9 @@ export function EditableCertifications({ initialCertifications, onSave, dictiona
                       placeholder={dictionary?.profile?.forms?.certificationName || 'Certification name'}
                       value={cert.name}
                       onChange={(e) => updateCertification(index, 'name', e.target.value)}
-                      className="flex-1 bg-gray-700 border-gray-600 text-gray-300"
+                      className={`flex-1 bg-gray-700 text-gray-300 ${
+                        isFieldEmpty(cert, 'name') ? 'border-red-500 focus:border-red-500' : 'border-gray-600'
+                      }`}
                     />
                     <Button
                       size="sm"
@@ -121,13 +170,17 @@ export function EditableCertifications({ initialCertifications, onSave, dictiona
                       placeholder={dictionary?.profile?.forms?.issuer || 'Issuing organization'}
                       value={cert.issuer}
                       onChange={(e) => updateCertification(index, 'issuer', e.target.value)}
-                      className="bg-gray-700 border-gray-600 text-gray-300"
+                      className={`bg-gray-700 text-gray-300 ${
+                        isFieldEmpty(cert, 'issuer') ? 'border-red-500 focus:border-red-500' : 'border-gray-600'
+                      }`}
                     />
                     <Input
                       placeholder={dictionary?.profile?.forms?.year || 'Year (e.g., 2023)'}
                       value={cert.year}
                       onChange={(e) => updateCertification(index, 'year', e.target.value)}
-                      className="bg-gray-700 border-gray-600 text-gray-300"
+                      className={`bg-gray-700 text-gray-300 ${
+                        isFieldEmpty(cert, 'year') ? 'border-red-500 focus:border-red-500' : 'border-gray-600'
+                      }`}
                     />
                   </div>
                 </div>

@@ -7,10 +7,32 @@
     "myProfile": "My Profile"
   },
   "footer": {
+    "description": "AI-powered job matching platform connecting talented professionals with their dream opportunities.",
+    "services": "Services",
+    "jobSearch": "Job Search",
+    "careerGuidance": "Career Guidance",
+    "skillAssessment": "Skill Assessment",
+    "resumeBuilder": "Resume Builder",
+    "company": "Company",
+    "aboutUs": "About Us",
+    "careers": "Careers",
+    "press": "Press",
+    "blog": "Blog",
+    "legal": "Legal",
     "termsOfService": "Terms of Service",
     "privacy": "Privacy",
     "cookies": "Cookies",
-    "copyright": "© {year} Huntier Inc. All rights reserved."
+    "licensing": "Licensing",
+    "copyright": "© {year} Huntier Inc. All rights reserved.",
+    "sitemap": "Sitemap",
+    "accessibility": "Accessibility",
+    "doNotSell": "Do Not Sell My Info",
+    "social": {
+      "twitter": "Twitter",
+      "linkedin": "LinkedIn", 
+      "instagram": "Instagram",
+      "github": "GitHub"
+    }
   },
   "languageToggle": {
     "english": "English",

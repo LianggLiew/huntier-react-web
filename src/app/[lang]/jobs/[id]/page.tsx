@@ -1,6 +1,6 @@
 import { NavigationSidebar } from "@/components/ui/navigation-sidebar"
 import { JobDetail } from "@/components/features/jobs/job-detail"
-import { getDictionary } from "@/lib/dictionary"
+import { getDictionaryAsync } from "@/lib/dictionary"
 
 interface JobDetailPageProps {
   params: Promise<{ lang: string; id: string }> | { lang: string; id: string }
@@ -9,7 +9,7 @@ interface JobDetailPageProps {
 export default async function JobDetailPage({ params }: JobDetailPageProps) {
   const resolvedParams = await params
   const { lang, id } = resolvedParams
-  const dictionary = getDictionary(lang)
+  const dictionary = await getDictionaryAsync(lang)
 
   return (
     <NavigationSidebar>

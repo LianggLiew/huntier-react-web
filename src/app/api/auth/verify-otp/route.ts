@@ -3,6 +3,8 @@ import { validateContact, sanitizePhoneNumber } from '@/lib/otp-middleware'
 import { verifyOtp } from '@/lib/otp-final'
 import { ContactType } from '@/lib/blacklist'
 import { checkVerifyRateLimit } from '@/lib/rate-limiter'
+import { createUserSession, setSessionCookies } from '@/lib/auth'
+import { ApiResponse, OTPVerificationResponse } from '@/types/interface-contracts'
 
 export async function POST(request: NextRequest) {
   try {
@@ -104,17 +106,40 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // OTP verified successfully
-    return NextResponse.json(
-      {
-        success: true,
-        message: 'Verification successful',
-        contactValue: sanitizedContact,
-        contactType,
-        verifiedAt: new Date().toISOString()
-      },
-      { status: 200 }
-    )
+    // OTP verified successfully - create user session
+    const sessionResult = await createUserSession(sanitizedContact, contactType as ContactType)
+
+    if (!sessionResult.success) {
+      return NextResponse.json(
+        { 
+          error: 'Session creation failed',
+          message: sessionResult.error || 'Unable to create user session'
+        },
+        { status: 500 }
+      )
+    }
+
+    // Prepare response data according to interface contract
+    const responseData: OTPVerificationResponse = {
+      success: true,
+      sessionToken: sessionResult.sessionToken!,
+      user: sessionResult.user!,
+      redirectTo: sessionResult.redirectTo!,
+      blacklisted: false
+    }
+
+    const apiResponse: ApiResponse<OTPVerificationResponse> = {
+      success: true,
+      data: responseData
+    }
+
+    // Create response with session cookies
+    const response = NextResponse.json(apiResponse, { status: 200 })
+    
+    // Set session cookies
+    setSessionCookies(response, sessionResult.sessionToken!, sessionResult.refreshToken!)
+
+    return response
 
   } catch (error) {
     console.error('Error in verify-otp API:', error)

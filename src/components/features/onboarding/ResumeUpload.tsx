@@ -1,4 +1,11 @@
 // Copilot: This component renders a drag-and-drop upload for resumes (.pdf/.docx)
+// TODO: This component can be refactored to use the useResumeUpload hook for consistency
+// Example usage:
+// const { uploadResume, isUploading, validateFile } = useResumeUpload({
+//   onSuccess: (result) => onFileUpload(result.file),
+//   showToasts: false // handle errors locally
+// });
+
 "use client";
 
 import { useState, useRef } from "react";

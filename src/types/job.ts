@@ -1,3 +1,12 @@
+/**
+ * CORE JOB SYSTEM TYPES
+ * ====================
+ * Core entities, database schemas, and job listing functionality
+ */
+
+/**
+ * Company entity from database
+ */
 export interface Company {
   company_id: number
   name: string
@@ -9,6 +18,9 @@ export interface Company {
   benefits?: string[]
 }
 
+/**
+ * Job attributes and metadata
+ */
 export interface JobAttributes {
   job_id: number
   hiring_manager?: string
@@ -16,6 +28,10 @@ export interface JobAttributes {
   additional_info?: string
 }
 
+/**
+ * Main Job interface - comprehensive job data structure
+ * Contains both database fields and UI-specific fields for backward compatibility
+ */
 export interface Job {
   job_id: number
   title: string
@@ -54,16 +70,9 @@ export interface Job {
   isBookmarked?: boolean
 }
 
-// Response type for job listing API
-export interface JobListingResponse {
-  jobs: Job[]
-  total: number
-  page: number
-  limit: number
-  hasMore: boolean
-}
-
-// Database types that match the actual schema
+/**
+ * Database job record - matches actual database schema
+ */
 export interface DbJob {
   job_id: number
   title: string
@@ -82,7 +91,10 @@ export interface DbJob {
   attributes?: JobAttributes
 }
 
-// Utility function to transform database job to UI job
+/**
+ * Utility function to transform database job record to UI job object
+ * Handles mapping between database fields and UI-friendly fields
+ */
 export function transformDbJobToUiJob(dbJob: DbJob): Job {
   return {
     // Database fields
@@ -121,6 +133,9 @@ export function transformDbJobToUiJob(dbJob: DbJob): Job {
   }
 }
 
+/**
+ * Job filtering options for search and listing
+ */
 export interface JobFilters {
   type?: Job['type'][]
   salaryRange?: {
@@ -128,6 +143,13 @@ export interface JobFilters {
     max: number
   }
   category?: string
+  location?: string
+  employmentTypes?: string[]
+  recruitType?: string
+  salaryMin?: number
+  salaryMax?: number
+  skills?: string[]
+  companyNiche?: string
 }
 
 export interface JobListingResponse {

@@ -1,400 +1,75 @@
-// Simple dictionary implementation without dynamic imports
-// to avoid chunk loading issues
+// Page-based translation dictionary system with backward compatibility
+import { loadAllTranslations, loadCoreTranslations } from '../translations';
 
-const dictionaries: Record<string, any> = {
-  en: {
-    navbar: {
-      findJobs: "Find Jobs",
-      companies: "Companies",
-      resources: "Resources",
-      about: "About",
-      myProfile: "My Profile",
-    },
-    footer: {
-      termsOfService: "Terms of Service",
-      privacy: "Privacy",
-      cookies: "Cookies",
-      copyright: "© {year} Huntier Inc. All rights reserved.",
-    },
-    languageToggle: {
-      english: "English",
-      chinese: "中文 (Chinese)",
-    },
-    navigation: {
-      home: "Home",
-      jobs: "Jobs", 
-      resume: "Resume",
-      interviews: "Interviews",
-      points: "Points",
-      profile: "Profile"
-    },
-    profile: {
-      loading: "Loading profile...",
-      tabs: {
-        profile: "Profile",
-        applications: "Applications",
-        savedJobs: "Saved Jobs"
-      },
-      jobApplications: "Job Applications",
-      savedJobs: "Saved Jobs",
-      buttons: {
-        viewApplication: "View Application",
-        withdraw: "Withdraw",
-        viewJob: "View Job",
-        applyNow: "Apply Now",
-        remove: "Remove",
-        edit: "Edit",
-        save: "Save",
-        cancel: "Cancel",
-        add: "Add",
-        delete: "Delete"
-      },
-      sections: {
-        about: "About",
-        experience: "Experience",
-        education: "Education",
-        skills: "Skills",
-        certifications: "Certifications",
-        projects: "Projects"
-      },
-      forms: {
-        jobTitle: "Job Title",
-        company: "Company",
-        period: "Period (e.g., Jan 2021 - Present)",
-        description: "Description",
-        degree: "Degree",
-        institution: "Institution",
-        skillName: "Skill Name",
-        proficiency: "Proficiency",
-        certificationName: "Certification Name",
-        issuer: "Issuer",
-        year: "Year",
-        projectName: "Project Name",
-        technologies: "Technologies",
-        addExperience: "Add Experience",
-        addEducation: "Add Education",
-        addSkill: "Add Skill",
-        addCertification: "Add Certification",
-        addProject: "Add Project"
-      },
-      sidebar: {
-        profileCompletion: "Profile Completion",
-        overall: "Overall",
-        jobPreferences: "Job Preferences",
-        jobTypes: "Job Types",
-        locations: "Locations",
-        desiredSalary: "Desired Salary",
-        industries: "Industries",
-        remotePreference: "Remote Preference",
-        cv: "CV"
-      },
-      toast: {
-        aboutUpdated: "About section updated",
-        aboutDescription: "Your about section has been saved successfully.",
-        experienceUpdated: "Experience updated",
-        experienceDescription: "Your work experience has been saved successfully.",
-        educationUpdated: "Education updated",
-        educationDescription: "Your education details have been saved successfully.",
-        skillsUpdated: "Skills updated",
-        skillsDescription: "Your skills have been saved successfully.",
-        certificationsUpdated: "Certifications updated",
-        certificationsDescription: "Your certifications have been saved successfully.",
-        projectsUpdated: "Projects updated",
-        projectsDescription: "Your projects have been saved successfully.",
-        personalInfoUpdated: "Personal info updated",
-        personalInfoDescription: "Your personal information has been saved successfully.",
-        profilePictureUpdated: "Profile picture updated",
-        profilePictureDescription: "Your profile picture has been updated successfully."
-      }
-    },
-    verifyOtp: {
-      verificationRequired: "Verification Required",
-      passwordlessLogin: "Passwordless Login",
-      verifyIdentity: "Verify your identity to access your account",
-      findJob: "I want to find a job",
-      wantToHire: "I want to hire",
-      emailVerification: "Email Verification",
-      phoneVerification: "Phone Verification",
-      emailDescription: "We'll send a verification code to your email address",
-      phoneDescription: "We'll send a verification code to your phone number",
-      placeholders: {
-        email: "Enter your email address",
-        phone: "Phone number"
-      },
-      enterCode: "Enter the 6-digit verification code sent to your {type}",
-      sendCode: "Send verification code",
-      loginRegister: "Login/Register",
-      resendCode: "Resend verification code",
-      resendCodeTimer: "Resend code ({time}s)",
-      sendingCode: "Sending verification code...",
-      verifying: "Verifying...",
-      wechatLogin: "WeChat Login/Register",
-      termsText: "I have read and agree to the",
-      termsOfService: "Terms of Service",
-      and: "and",
-      privacyPolicy: "Privacy Policy",
-      customerService: "Customer Service: 400-065-5799 | Working Hours: 8:00-22:00",
-      licenseInfo: "Human Resources Service License | Business License | Chaoyang District Social Bureau Supervision",
-      errors: {
-        enterEmail: "Please enter your email address",
-        enterPhone: "Please enter your phone number",
-        validEmail: "Please enter a valid email address",
-        validPhone: "Please enter a valid phone number",
-        enter6Digit: "Please enter the 6-digit verification code",
-        otpSent: "OTP Sent",
-        otpSentDescription: "We've sent a verification code to your {type}",
-        accessRestricted: "Access Restricted",
-        accessRestrictedDescription: "This contact has been temporarily blocked. Please try again later.",
-        tooManyAttempts: "Too Many Attempts",
-        tooManyAttemptsDescription: "You have exceeded the maximum number of send attempts. Please try again later.",
-        sendFailed: "Failed to send OTP",
-        sendFailedDescription: "Please try again later",
-        verificationSuccessful: "Verification Successful",
-        verificationSuccessfulDescription: "You have been successfully verified",
-        accountLocked: "Too Many Failed Attempts",
-        accountLockedDescription: "Your account has been temporarily locked. Please try again later.",
-        codeExpired: "Code Expired",
-        codeExpiredDescription: "Your verification code has expired. Please request a new one.",
-        verificationFailed: "Verification Failed",
-        verificationFailedDescription: "Invalid verification code. Please try again."
-      }
-    },
-    jobs: {
-      title: "Explore Job Opportunities with Huntier",
-    },
-    home: {
-      title: "Find Your Dream Job with",
-      titleHighlight: "AI-Powered",
-      titleEnd: "Matching",
-      subtitle:
-        "Huntier uses advanced AI to match your skills and preferences with the perfect job opportunities. Get personalized recommendations and apply with confidence.",
-      findJobsButton: "Find Jobs",
-      viewProfileButton: "View My Profile",
-      feature1: "AI-Powered Matching",
-      feature2: "10,000+ Jobs",
-      feature3: "Free to Use",
-    },
-    resources: {
-      title: "Career Resources",
-      subtitle: "Enhance your career with our curated collection of resources, guides, and tools",
-      searchPlaceholder: "Search resources...",
-      categories: {
-        all: "All Resources",
-        articles: "Articles",
-        videos: "Videos",
-        tools: "Tools",
-        guides: "Guides"
-      },
-      featured: "Featured Resource",
-      popular: "Popular Resources",
-      newContent: "New Content",
-      readMore: "Read More",
-      watchNow: "Watch Now",
-      tryNow: "Try Now",
-      saveButton: "Save",
-      savedButton: "Saved",
-      relatedResources: "Related Resources",
-      shareResource: "Share Resource",
-      filterByTopic: "Filter by Topic"
-    },
-  },
-  zh: {
-    navbar: {
-      findJobs: "寻找工作",
-      companies: "公司",
-      resources: "资源",
-      about: "关于我们",
-      myProfile: "我的简历",
-    },
-    footer: {
-      termsOfService: "服务条款",
-      privacy: "隐私政策",
-      cookies: "Cookie 政策",
-      copyright: "© {year} Huntier Inc. 保留所有权利。",
-    },
-    languageToggle: {
-      english: "English",
-      chinese: "中文",
-    },
-    navigation: {
-      home: "首页",
-      jobs: "职位",
-      resume: "简历",
-      interviews: "面试",
-      points: "积分",
-      profile: "个人资料"
-    },
-    profile: {
-      loading: "加载个人资料...",
-      tabs: {
-        profile: "个人资料",
-        applications: "申请记录",
-        savedJobs: "已保存职位"
-      },
-      jobApplications: "工作申请",
-      savedJobs: "已保存职位",
-      buttons: {
-        viewApplication: "查看申请",
-        withdraw: "撤回",
-        viewJob: "查看职位",
-        applyNow: "立即申请",
-        remove: "移除",
-        edit: "编辑",
-        save: "保存",
-        cancel: "取消",
-        add: "添加",
-        delete: "删除"
-      },
-      sections: {
-        about: "关于我",
-        experience: "工作经历",
-        education: "教育背景",
-        skills: "技能",
-        certifications: "证书",
-        projects: "项目经验"
-      },
-      forms: {
-        jobTitle: "职位名称",
-        company: "公司",
-        period: "时间段 (例如：2021年1月 - 至今)",
-        description: "工作描述",
-        degree: "学位",
-        institution: "学校",
-        skillName: "技能名称",
-        proficiency: "熟练程度",
-        certificationName: "证书名称",
-        issuer: "颁发机构",
-        year: "年份",
-        projectName: "项目名称",
-        technologies: "技术栈",
-        addExperience: "添加工作经历",
-        addEducation: "添加教育经历",
-        addSkill: "添加技能",
-        addCertification: "添加证书",
-        addProject: "添加项目"
-      },
-      sidebar: {
-        profileCompletion: "资料完成度",
-        overall: "总体",
-        jobPreferences: "求职偏好",
-        jobTypes: "职位类型",
-        locations: "工作地点",
-        desiredSalary: "期望薪资",
-        industries: "行业",
-        remotePreference: "远程工作偏好",
-        cv: "简历"
-      },
-      toast: {
-        aboutUpdated: "关于部分已更新",
-        aboutDescription: "您的关于部分已成功保存。",
-        experienceUpdated: "工作经历已更新",
-        experienceDescription: "您的工作经历已成功保存。",
-        educationUpdated: "教育背景已更新",
-        educationDescription: "您的教育详情已成功保存。",
-        skillsUpdated: "技能已更新",
-        skillsDescription: "您的技能已成功保存。",
-        certificationsUpdated: "证书已更新",
-        certificationsDescription: "您的证书已成功保存。",
-        projectsUpdated: "项目已更新",
-        projectsDescription: "您的项目已成功保存。",
-        personalInfoUpdated: "个人信息已更新",
-        personalInfoDescription: "您的个人信息已成功保存。",
-        profilePictureUpdated: "头像已更新",
-        profilePictureDescription: "您的头像已成功更新。"
-      }
-    },
-    verifyOtp: {
-      verificationRequired: "需要验证",
-      passwordlessLogin: "免密登录",
-      verifyIdentity: "验证您的身份以访问您的账户",
-      findJob: "我想找工作",
-      wantToHire: "我想招聘",
-      emailVerification: "邮箱验证",
-      phoneVerification: "手机验证",
-      emailDescription: "我们将向您的邮箱发送验证码",
-      phoneDescription: "我们将向您的手机发送验证码",
-      placeholders: {
-        email: "输入您的邮箱地址",
-        phone: "手机号码"
-      },
-      enterCode: "输入发送到您{type}的6位验证码",
-      sendCode: "发送验证码",
-      loginRegister: "登录/注册",
-      resendCode: "重新发送验证码",
-      resendCodeTimer: "重新发送验证码 ({time}秒)",
-      sendingCode: "正在发送验证码...",
-      verifying: "验证中...",
-      wechatLogin: "微信登录/注册",
-      termsText: "我已阅读并同意",
-      termsOfService: "服务条款",
-      and: "和",
-      privacyPolicy: "隐私政策",
-      customerService: "客服热线：400-065-5799 | 工作时间：8:00-22:00",
-      licenseInfo: "人力资源服务许可证 | 营业执照 | 朝阳区社会局监管",
-      errors: {
-        enterEmail: "请输入您的邮箱地址",
-        enterPhone: "请输入您的手机号码",
-        validEmail: "请输入有效的邮箱地址",
-        validPhone: "请输入有效的手机号码",
-        enter6Digit: "请输入6位验证码",
-        otpSent: "验证码已发送",
-        otpSentDescription: "我们已向您的{type}发送验证码",
-        accessRestricted: "访问受限",
-        accessRestrictedDescription: "此联系方式已被暂时屏蔽，请稍后再试。",
-        tooManyAttempts: "尝试次数过多",
-        tooManyAttemptsDescription: "您已超过最大发送次数限制，请稍后再试。",
-        sendFailed: "发送验证码失败",
-        sendFailedDescription: "请稍后再试",
-        verificationSuccessful: "验证成功",
-        verificationSuccessfulDescription: "您已成功通过验证",
-        accountLocked: "账户已被临时锁定",
-        accountLockedDescription: "由于失败尝试次数过多，您的账户已被临时锁定。请稍后再试。",
-        codeExpired: "验证码已过期",
-        codeExpiredDescription: "您的验证码已过期，请重新获取。",
-        verificationFailed: "验证失败",
-        verificationFailedDescription: "验证码无效，请重试。"
-      }
-    },
-    resources: {
-      title: "职业资源",
-      subtitle: "通过我们精心策划的资源、指南和工具提升您的职业生涯",
-      searchPlaceholder: "搜索资源...",
-      categories: {
-        all: "所有资源",
-        articles: "文章",
-        videos: "视频",
-        tools: "工具",
-        guides: "指南"
-      },
-      featured: "精选资源",
-      popular: "热门资源",
-      newContent: "最新内容",
-      readMore: "阅读更多",
-      watchNow: "立即观看",
-      tryNow: "立即尝试",
-      saveButton: "保存",
-      savedButton: "已保存",
-      relatedResources: "相关资源",
-      shareResource: "分享资源",
-      filterByTopic: "按主题筛选"
-    },
-    jobs: {
-      title: "与 Huntier 一起探索职位机会",
-    },
-    home: {
-      title: "通过",
-      titleHighlight: "AI 驱动",
-      titleEnd: "匹配找到理想工作",
-      subtitle: "Huntier 使用先进的人工智能技术，将您的技能和偏好与完美的工作机会相匹配。获取个性化推荐，自信申请。",
-      findJobsButton: "寻找工作",
-      viewProfileButton: "查看我的简历",
-      feature1: "AI 驱动匹配",
-      feature2: "10,000+ 个工作",
-      feature3: "免费使用",
-    },
-  },
-}
+// Cache for loaded translations
+let translationCache: Record<string, any> = {};
 
+// Load all translations using the new page-based system
+const loadTranslations = async (locale: string): Promise<any> => {
+  if (translationCache[locale]) {
+    return translationCache[locale];
+  }
+
+  try {
+    // Always ensure core translations are loaded first
+    const coreKey = `core-${locale}`;
+    if (!translationCache[coreKey]) {
+      const coreTranslations = await loadCoreTranslations(locale);
+      translationCache[coreKey] = coreTranslations;
+    }
+
+    // Then load full translations
+    const translations = await loadAllTranslations(locale);
+    translationCache[locale] = translations;
+    return translations;
+  } catch (error) {
+    console.warn(`Failed to load translations for ${locale}, using core fallback`);
+    try {
+      const coreTranslations = await loadCoreTranslations(locale);
+      return coreTranslations;
+    } catch (coreError) {
+      console.error(`Failed to load core translations for ${locale}:`, coreError);
+      return {};
+    }
+  }
+};
+
+// Synchronous version for immediate use (returns cached or starts loading)
 export const getDictionary = (locale: string) => {
-  return dictionaries[locale] || dictionaries.en
-}
+  // If we have cached translations, return them
+  if (translationCache[locale]) {
+    return translationCache[locale];
+  }
+
+  // Start loading translations in background for next time
+  loadTranslations(locale).then(translations => {
+    translationCache[locale] = translations;
+  }).catch(error => {
+    console.warn(`Failed to load translations for ${locale}:`, error);
+  });
+
+  // Return empty object for immediate use - component should handle loading state
+  return {};
+};
+
+// Async version for components that can wait for full translations
+export const getDictionaryAsync = async (locale: string) => {
+  return await loadTranslations(locale);
+};
+
+// Get core translations immediately (for components like navbar/footer)
+export const getCoreTranslations = async (locale: string) => {
+  const coreKey = `core-${locale}`;
+  if (translationCache[coreKey]) {
+    return translationCache[coreKey];
+  }
+  
+  try {
+    const coreTranslations = await loadCoreTranslations(locale);
+    translationCache[coreKey] = coreTranslations;
+    return coreTranslations;
+  } catch (error) {
+    console.error(`Failed to load core translations for ${locale}:`, error);
+    return {};
+  }
+};

@@ -19,6 +19,19 @@
     "add": "添加",
     "delete": "删除"
   },
+  "applicationStatus": {
+    "checking": "检查中...",
+    "pending": "已申请 - 待处理", 
+    "reviewing": "审核中",
+    "interviewed": "已面试",
+    "accepted": "恭喜！",
+    "rejected": "未通过",
+    "applied": "已申请",
+    "review": "审核",
+    "interview": "面试",
+    "acceptedShort": "已录取",
+    "rejectedShort": "已拒绝"
+  },
   "sections": {
     "about": "关于我",
     "experience": "工作经历",

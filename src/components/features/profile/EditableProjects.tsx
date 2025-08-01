@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -13,6 +14,7 @@ interface Project {
   description: string;
   technologies: string[];
   technologiesString?: string;
+  isEmpty?: boolean;
 }
 
 interface EditableProjectsProps {
@@ -25,15 +27,42 @@ export function EditableProjects({ initialProjects, onSave, dictionary }: Editab
   const [isEditing, setIsEditing] = useState(false);
   const [projects, setProjects] = useState<Project[]>(initialProjects);
 
+  // Update local state when initialProjects prop changes
+  React.useEffect(() => {
+    if (!isEditing) {
+      setProjects(initialProjects);
+    }
+  }, [initialProjects, isEditing]);
+
+  const handleEditStart = () => {
+    // If we have empty state templates, start with a clean empty entry
+    if (initialProjects.length === 1 && initialProjects[0].isEmpty) {
+      setProjects([{ name: '', description: '', technologies: [], technologiesString: '' }]);
+    }
+    setIsEditing(true);
+  };
+
   const handleSave = () => {
-    // Parse technologies strings before saving
-    const processedProjects = projects.map(project => ({
-      ...project,
-      technologies: project.technologiesString 
-        ? parseTechnologies(project.technologiesString)
-        : project.technologies,
-      technologiesString: undefined // Remove temporary field
-    }));
+    // Check if all projects have required fields filled
+    const hasEmptyFields = projects.some(project => 
+      !project.name.trim() || !project.description.trim()
+    );
+    
+    if (hasEmptyFields) {
+      // Don't save if there are empty required fields
+      return;
+    }
+    
+    // Parse technologies strings and filter out empty projects before saving
+    const processedProjects = projects
+      .filter(project => project.name.trim() && project.description.trim()) // Filter out empty projects
+      .map(project => ({
+        ...project,
+        technologies: project.technologiesString 
+          ? parseTechnologies(project.technologiesString)
+          : project.technologies,
+        technologiesString: undefined // Remove temporary field
+      }));
     onSave(processedProjects);
     setIsEditing(false);
   };
@@ -67,6 +96,17 @@ export function EditableProjects({ initialProjects, onSave, dictionary }: Editab
     return techString.split(',').map(tech => tech.trim()).filter(tech => tech.length > 0);
   };
 
+  const isFieldEmpty = (project: Project, field: keyof Project) => {
+    const value = project[field];
+    return !value || (typeof value === 'string' && value.trim() === '');
+  };
+
+  const hasEmptyRequiredFields = () => {
+    return projects.some(project => 
+      isFieldEmpty(project, 'name') || isFieldEmpty(project, 'description')
+    );
+  };
+
   return (
     <Card className="bg-gray-900 border-gray-800 hover:border-emerald-500/50 transition-all duration-200 shadow-lg hover:shadow-emerald-500/10">
       <div className="p-6">
@@ -79,7 +119,7 @@ export function EditableProjects({ initialProjects, onSave, dictionary }: Editab
             <Button 
               size="sm" 
               className="h-7 px-2 text-xs bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600"
-              onClick={() => setIsEditing(true)}
+              onClick={handleEditStart}
             >
               <Edit size={12} className="mr-1" />
               {dictionary?.profile?.buttons?.edit || 'Edit'}
@@ -88,8 +128,13 @@ export function EditableProjects({ initialProjects, onSave, dictionary }: Editab
             <div className="flex gap-2">
               <Button 
                 size="sm" 
-                className="h-7 px-2 text-xs bg-emerald-600 hover:bg-emerald-700"
+                className={`h-7 px-2 text-xs ${
+                  hasEmptyRequiredFields() 
+                    ? 'bg-gray-600 cursor-not-allowed opacity-50' 
+                    : 'bg-emerald-600 hover:bg-emerald-700'
+                }`}
                 onClick={handleSave}
+                disabled={hasEmptyRequiredFields()}
               >
                 <Save size={12} className="mr-1" />
                 {dictionary?.profile?.buttons?.save || 'Save'}
@@ -132,7 +177,9 @@ export function EditableProjects({ initialProjects, onSave, dictionary }: Editab
                       placeholder={dictionary?.profile?.forms?.projectName || 'Project name'}
                       value={project.name}
                       onChange={(e) => updateProject(index, 'name', e.target.value)}
-                      className="flex-1 bg-gray-700 border-gray-600 text-gray-300"
+                      className={`flex-1 bg-gray-700 text-gray-300 ${
+                        isFieldEmpty(project, 'name') ? 'border-red-500 focus:border-red-500' : 'border-gray-600'
+                      }`}
                     />
                     <Button
                       size="sm"
@@ -147,7 +194,9 @@ export function EditableProjects({ initialProjects, onSave, dictionary }: Editab
                     placeholder={dictionary?.profile?.forms?.projectDescription || 'Project description, key features, and impact...'}
                     value={project.description}
                     onChange={(e) => updateProject(index, 'description', e.target.value)}
-                    className="min-h-[80px] bg-gray-700 border-gray-600 text-gray-300 resize-none"
+                    className={`min-h-[80px] bg-gray-700 text-gray-300 resize-none ${
+                      isFieldEmpty(project, 'description') ? 'border-red-500 focus:border-red-500' : 'border-gray-600'
+                    }`}
                   />
                   <div className="space-y-2">
                     <Input

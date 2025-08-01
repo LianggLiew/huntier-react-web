@@ -1,0 +1,55 @@
+{
+  "title": "欢迎来到 Huntier",
+  "subtitle": "完善您的资料，开始个性化职位匹配",
+  "steps": {
+    "personalInfo": "个人资料",
+    "uploadResume": "上传简历"
+  },
+  "stepDescriptions": {
+    "personalInfo": "告诉我们关于您的信息以创建资料",
+    "uploadResume": "上传您的简历以完善资料（可选）"
+  },
+  "buttons": {
+    "previous": "上一步",
+    "continue": "继续",
+    "saving": "保存中...",
+    "skipUpload": "跳过上传",
+    "uploadComplete": "上传并完成",
+    "completeSetup": "完成设置",
+    "processing": "处理中...",
+    "chooseFile": "选择文件",
+    "removeFile": "移除"
+  },
+  "fileUpload": {
+    "title": "上传您的简历",
+    "description": "将简历拖拽到此处或点击浏览",
+    "supportedFormats": "支持格式：PDF、DOC、DOCX",
+    "maxSize": "最大文件大小：5MB",
+    "dropHere": "将简历拖拽到此处",
+    "clickToBrowse": "或点击浏览",
+    "selectedFile": "已选择文件：",
+    "fileSize": "文件大小："
+  },
+  "validation": {
+    "completeRequired": "请完成所有必填字段",
+    "contactRequired": "需要邮箱或手机号码",
+    "invalidFileType": "无效的文件类型",
+    "invalidFileTypeDesc": "仅支持 PDF 和 DOC/DOCX 文件",
+    "fileTooLarge": "文件过大",
+    "fileTooLargeDesc": "最大文件大小为 5MB"
+  },
+  "toast": {
+    "personalInfoSaved": "个人信息已保存",
+    "personalInfoSavedDesc": "您的资料已成功更新",
+    "personalInfoError": "保存信息时出错",
+    "personalInfoErrorDesc": "请重试",
+    "resumeUploaded": "简历上传成功",
+    "resumeUploadedDesc": "您的简历已保存到资料中",
+    "resumeUploadError": "上传简历时出错",
+    "resumeUploadErrorDesc": "请重试或跳过此步骤",
+    "welcome": "欢迎来到 Huntier！",
+    "welcomeDesc": "您的资料已准备就绪。让我们为您寻找优秀的机会！",
+    "onboardingError": "完成入职流程时出错",
+    "onboardingErrorDesc": "请重试"
+  }
+}

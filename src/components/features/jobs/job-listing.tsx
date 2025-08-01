@@ -403,19 +403,8 @@ export function JobListing({
               filteredJobs.map((job, index) => (
                 <JobCard
                   key={job.id}
-                  id={job.id}
-                  title={job.title}
-                  company={job.companyName}
-                  location={job.location || ''}
-                  salary={job.salary ? `${job.salary.currency}${job.salary.min.toLocaleString()} - ${job.salary.currency}${job.salary.max.toLocaleString()}` : 'Salary not specified'}
-                  postedDate={job.postedDate}
-                  description={job.description || ''}
-                  skills={job.skills}
-                  matchPercentage={Math.floor(Math.random() * 30) + 70} // Mock match percentage
-                  isRemote={job.isRemote}
-                  isHybrid={!job.isRemote && (job.location || '').toLowerCase().includes('hybrid')}
+                  job={job}
                   animationDelay={index % 4}
-                  logo={job.companyLogo}
                   lang={lang}
                 />
               ))

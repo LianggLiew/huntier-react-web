@@ -1,10 +1,11 @@
 {
   "title": "Find Your Dream Job with",
-  "titleHighlight": "AI-Powered",
+  "titleHighlight": "AI-Powered", 
   "titleEnd": "Matching",
   "subtitle": "Huntier uses advanced AI to match your skills and preferences with the perfect job opportunities. Get personalized recommendations and apply with confidence.",
   "findJobsButton": "Find Jobs",
   "viewProfileButton": "View My Profile",
+  "signInButton": "Sign In",
   "feature1": "AI-Powered Matching",
   "feature2": "10,000+ Jobs",
   "feature3": "Free to Use"

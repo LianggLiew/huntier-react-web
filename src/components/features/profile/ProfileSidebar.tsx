@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Edit, Download } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Edit, Download, Upload, ChevronDown } from 'lucide-react';
 import { ProfilePictureUpload } from './ProfilePictureUpload';
 
 interface CompletionItem {
@@ -24,10 +25,15 @@ interface JobPreferences {
 interface ProfileSidebarProps {
   // User data
   name: string;
-  title: string;
-  location: string;
-  availability: string;
   profileImage: string;
+  firstName?: string;
+  lastName?: string;
+  dateOfBirth?: string;
+  nationality?: string;
+  phone?: string;
+  email?: string;
+  education?: string;
+  major?: string;
   
   // Progress data
   profileCompletion: number;
@@ -40,6 +46,8 @@ interface ProfileSidebarProps {
   onEditClick: () => void;
   onProfileImageSave: (imageData: string) => void;
   onDownloadCV?: () => void;
+  onUploadCV?: () => void;
+  hasResume?: boolean;
   
   // Language support
   dictionary?: any;
@@ -47,16 +55,23 @@ interface ProfileSidebarProps {
 
 export function ProfileSidebar({
   name,
-  title,
-  location,
-  availability,
   profileImage,
+  firstName,
+  lastName,
+  dateOfBirth,
+  nationality,
+  phone,
+  email,
+  education,
+  major,
   profileCompletion,
   completionItems,
   jobPreferences,
   onEditClick,
   onProfileImageSave,
   onDownloadCV,
+  onUploadCV,
+  hasResume,
   dictionary
 }: ProfileSidebarProps) {
   return (
@@ -69,14 +84,32 @@ export function ProfileSidebar({
             userName={name}
             onImageSave={onProfileImageSave}
           />
-          <h1 className="text-xl font-bold text-white mb-1">{name}</h1>
-          <p className="text-gray-400 text-sm mb-2">{title}</p>
-          <div className="flex items-center text-gray-500 text-xs mb-1">
-            <span>📍 {location}</span>
-          </div>
-          <Badge variant="outline" className="text-xs border-emerald-500 text-emerald-400 mb-4">
-            {availability}
-          </Badge>
+          <h1 className="text-xl font-bold text-white mb-1 pt-3">{name}</h1>
+          
+          {/* Personal Information */}
+          {(nationality || education || major) && (
+            <div className="w-full mb-3 text-left">
+              {nationality && (
+                <div className="mb-1">
+                  <span className="text-xs text-gray-400">Nationality:</span>
+                  <span className="text-sm text-gray-300 ml-2">{nationality}</span>
+                </div>
+              )}
+              {education && (
+                <div className="mb-1">
+                  <span className="text-xs text-gray-400">Education:</span>
+                  <span className="text-sm text-gray-300 ml-2">{education}</span>
+                </div>
+              )}
+              {major && (
+                <div className="mb-1">
+                  <span className="text-xs text-gray-400">Major:</span>
+                  <span className="text-sm text-gray-300 ml-2">{major}</span>
+                </div>
+              )}
+            </div>
+          )}
+          
           <div className="flex gap-2 w-full">
             <Button 
               size="sm" 
@@ -86,14 +119,27 @@ export function ProfileSidebar({
               <Edit size={12} className="mr-1" />
               {dictionary?.profile?.buttons?.edit || 'Edit'}
             </Button>
-            <Button 
-              size="sm" 
-              className="flex-1 bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 text-xs px-1"
-              onClick={onDownloadCV}
-            >
-              <Download size={12} className="mr-1" />
-              {dictionary?.profile?.sidebar?.cv || 'CV'}
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  size="sm" 
+                  className="flex-1 bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 text-xs px-1"
+                >
+                  {dictionary?.profile?.sidebar?.resume || 'Resume'}
+                  <ChevronDown size={12} className="ml-1" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-40">
+                <DropdownMenuItem onClick={onUploadCV} className="cursor-pointer">
+                  <Upload size={14} className="mr-2" />
+                  {dictionary?.profile?.sidebar?.uploadResume || 'Upload Resume'}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={onDownloadCV} className="cursor-pointer">
+                  <Download size={14} className="mr-2" />
+                  {dictionary?.profile?.sidebar?.downloadResume || 'Download Resume'}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </Card>
@@ -132,7 +178,7 @@ export function ProfileSidebar({
       </Card>
 
       {/* Job Preferences */}
-      <Card className="bg-gray-900 border-gray-800">
+      {/* <Card className="bg-gray-900 border-gray-800">
         <div className="p-4">
           <h2 className="text-sm font-semibold text-white mb-3">{dictionary?.profile?.sidebar?.jobPreferences || 'Job Preferences'}</h2>
           <div className="space-y-3 text-xs">
@@ -164,7 +210,7 @@ export function ProfileSidebar({
             )}
           </div>
         </div>
-      </Card>
+      </Card> */}
     </div>
   );
 }

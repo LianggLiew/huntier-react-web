@@ -1,0 +1,55 @@
+{
+  "title": "Welcome to Huntier",
+  "subtitle": "Complete your profile to get started with personalized job matching",
+  "steps": {
+    "personalInfo": "Personal Information",
+    "uploadResume": "Upload Resume"
+  },
+  "stepDescriptions": {
+    "personalInfo": "Tell us about yourself to create your profile",
+    "uploadResume": "Upload your resume to enhance your profile (optional)"
+  },
+  "buttons": {
+    "previous": "Previous",
+    "continue": "Continue",
+    "saving": "Saving...",
+    "skipUpload": "Skip Upload",
+    "uploadComplete": "Upload & Complete",
+    "completeSetup": "Complete Setup",
+    "processing": "Processing...",
+    "chooseFile": "Choose File",
+    "removeFile": "Remove"
+  },
+  "fileUpload": {
+    "title": "Upload Your Resume",
+    "description": "Drop your resume here or click to browse",
+    "supportedFormats": "Supported formats: PDF, DOC, DOCX",
+    "maxSize": "Maximum file size: 5MB",
+    "dropHere": "Drop your resume here",
+    "clickToBrowse": "or click to browse",
+    "selectedFile": "Selected file:",
+    "fileSize": "File size:"
+  },
+  "validation": {
+    "completeRequired": "Please complete all required fields",
+    "contactRequired": "Email or phone number is required",
+    "invalidFileType": "Invalid file type",
+    "invalidFileTypeDesc": "Only PDF and DOC/DOCX files are allowed",
+    "fileTooLarge": "File too large",
+    "fileTooLargeDesc": "Maximum file size is 5MB"
+  },
+  "toast": {
+    "personalInfoSaved": "Personal information saved",
+    "personalInfoSavedDesc": "Your profile has been updated successfully",
+    "personalInfoError": "Error saving information",
+    "personalInfoErrorDesc": "Please try again",
+    "resumeUploaded": "Resume uploaded successfully",
+    "resumeUploadedDesc": "Your resume has been saved to your profile",
+    "resumeUploadError": "Error uploading resume",
+    "resumeUploadErrorDesc": "Please try again or skip this step",
+    "welcome": "Welcome to Huntier!",
+    "welcomeDesc": "Your profile is ready. Let's find you some great opportunities!",
+    "onboardingError": "Error completing onboarding",
+    "onboardingErrorDesc": "Please try again"
+  }
+}

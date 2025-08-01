@@ -1,190 +1,160 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { User, Briefcase, MapPin, Save, X } from 'lucide-react';
-
-interface PersonalInfo {
-  name: string;
-  title: string;
-  location: string;
-  availability: string;
-}
+import { Save, X } from 'lucide-react';
+import PersonalInfoForm, { type PersonalInfo as OnboardingPersonalInfo } from '@/components/features/onboarding/PersonalInfoForm';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 
 interface PersonalInfoModalProps {
   isOpen: boolean;
   onClose: () => void;
-  initialInfo: PersonalInfo;
-  onSave: (info: PersonalInfo) => void;
+  onSave?: () => void;
 }
 
-const availabilityOptions = [
-  'Open to Remote',
-  'Open to Hybrid',
-  'Office Only',
-  'Fully Remote',
-  'Open to Work',
-  'Not Available',
-  'Available Immediately',
-  'Available in 2 weeks',
-  'Available in 1 month'
-];
 
-export function PersonalInfoModal({ isOpen, onClose, initialInfo, onSave }: PersonalInfoModalProps) {
-  const [info, setInfo] = useState<PersonalInfo>(initialInfo);
-  const [errors, setErrors] = useState<Partial<PersonalInfo>>({});
+export function PersonalInfoModal({ isOpen, onClose, onSave }: PersonalInfoModalProps) {
+  const { user, profile, updateProfile} = useAuth();
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  const [personalInfo, setPersonalInfo] = useState<OnboardingPersonalInfo>({
+    firstName: '',
+    lastName: '',
+    dateOfBirth: '',
+    nationality: '',
+    phone: '',
+    email: '',
+    education: '',
+    major: ''
+  });
 
-  const validateForm = (): boolean => {
-    const newErrors: Partial<PersonalInfo> = {};
-    
-    if (!info.name.trim()) newErrors.name = 'Name is required';
-    if (!info.title.trim()) newErrors.title = 'Job title is required';
-    if (!info.location.trim()) newErrors.location = 'Location is required';
-    if (!info.availability) newErrors.availability = 'Availability status is required';
-    
-    if (info.name.length > 50) newErrors.name = 'Name must be less than 50 characters';
-    if (info.title.length > 100) newErrors.title = 'Title must be less than 100 characters';
-    if (info.location.length > 100) newErrors.location = 'Location must be less than 100 characters';
+  // Update form when user/profile data changes
+  useEffect(() => {
+    if (isOpen && (profile || user)) {
+      setPersonalInfo({
+        firstName: profile?.firstName || '',
+        lastName: profile?.lastName || '',
+        dateOfBirth: profile?.dateOfBirth || '',
+        nationality: profile?.nationality || '',
+        phone: user?.phone || '',
+        email: user?.email || '',
+        education: profile?.highestDegree || '',
+        major: profile?.major || ''
+      });
+    }
+  }, [isOpen, profile, user]);
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  const updatePersonalInfo = (field: keyof OnboardingPersonalInfo, value: string) => {
+    setPersonalInfo(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSave = () => {
-    if (validateForm()) {
-      onSave(info);
+  // Check if personal info form is complete (for button state)
+  const isPersonalInfoComplete = (): boolean => {
+    const requiredFields: (keyof OnboardingPersonalInfo)[] = [
+      'firstName', 'lastName', 'dateOfBirth', 'nationality', 'education', 'major'
+    ];
+    
+    // Check if email or phone is provided (one is required)
+    const hasContact = Boolean((user?.email || personalInfo.email) || (user?.phone || personalInfo.phone));
+    
+    const missingFields = requiredFields.filter(field => !personalInfo[field]);
+    
+    return missingFields.length === 0 && hasContact;
+  };
+
+  const handleSave = async () => {
+    if (!isPersonalInfoComplete()) {
+      toast({
+        title: "Please complete all required fields",
+        description: "All fields are required to save your personal information",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Save personal info to profile
+      await updateProfile({
+        firstName: personalInfo.firstName,
+        lastName: personalInfo.lastName,
+        dateOfBirth: personalInfo.dateOfBirth,
+        nationality: personalInfo.nationality,
+        major: personalInfo.major,
+        highestDegree: personalInfo.education
+      });
+
+      toast({
+        title: "Personal information updated",
+        description: "Your profile has been updated successfully"
+      });
+
+      if (onSave) onSave();
       onClose();
-      setErrors({});
+    } catch (error) {
+      console.error('Failed to save personal info:', error);
+      toast({
+        title: "Error saving information",
+        description: "Please try again",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleCancel = () => {
-    setInfo(initialInfo);
-    setErrors({});
     onClose();
   };
 
-  const updateField = (field: keyof PersonalInfo, value: string) => {
-    setInfo(prev => ({ ...prev, [field]: value }));
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }));
-    }
-  };
-
-  // Reset form when modal opens
+  // Reset form when modal opens/closes
   const handleOpenChange = (open: boolean) => {
-    if (open) {
-      setInfo(initialInfo);
-      setErrors({});
-    } else {
+    if (!open) {
       onClose();
     }
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent className="bg-gray-900 border-gray-800 text-white max-w-md">
+      <DialogContent className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border border-emerald-100/50 dark:border-emerald-800/50 shadow-xl max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold flex items-center gap-2">
+          <DialogTitle className="text-xl font-bold text-emerald-700 dark:text-emerald-300 flex items-center gap-2">
             <span className="w-1 h-6 bg-emerald-500 rounded-full"></span>
             Edit Personal Information
           </DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-4 pt-4">
-          {/* Name Field */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-              <User size={14} className="text-emerald-500" />
-              Full Name
-            </label>
-            <Input
-              value={info.name}
-              onChange={(e) => updateField('name', e.target.value)}
-              placeholder="Enter your full name"
-              className={`bg-gray-800 border-gray-700 text-gray-300 focus:border-emerald-500 focus:ring-emerald-500/20 ${
-                errors.name ? 'border-red-500' : ''
-              }`}
-            />
-            {errors.name && <p className="text-red-400 text-xs">{errors.name}</p>}
-          </div>
-
-          {/* Job Title Field */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-              <Briefcase size={14} className="text-emerald-500" />
-              Job Title
-            </label>
-            <Input
-              value={info.title}
-              onChange={(e) => updateField('title', e.target.value)}
-              placeholder="e.g., Senior Frontend Developer"
-              className={`bg-gray-800 border-gray-700 text-gray-300 focus:border-emerald-500 focus:ring-emerald-500/20 ${
-                errors.title ? 'border-red-500' : ''
-              }`}
-            />
-            {errors.title && <p className="text-red-400 text-xs">{errors.title}</p>}
-          </div>
-
-          {/* Location Field */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-              <MapPin size={14} className="text-emerald-500" />
-              Location
-            </label>
-            <Input
-              value={info.location}
-              onChange={(e) => updateField('location', e.target.value)}
-              placeholder="e.g., San Francisco, CA"
-              className={`bg-gray-800 border-gray-700 text-gray-300 focus:border-emerald-500 focus:ring-emerald-500/20 ${
-                errors.location ? 'border-red-500' : ''
-              }`}
-            />
-            {errors.location && <p className="text-red-400 text-xs">{errors.location}</p>}
-          </div>
-
-          {/* Availability Field */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-300">
-              Availability Status
-            </label>
-            <Select value={info.availability} onValueChange={(value) => updateField('availability', value)}>
-              <SelectTrigger className={`bg-gray-800 border-gray-700 text-gray-300 focus:border-emerald-500 focus:ring-emerald-500/20 ${
-                errors.availability ? 'border-red-500' : ''
-              }`}>
-                <SelectValue placeholder="Select availability status" />
-              </SelectTrigger>
-              <SelectContent className="bg-gray-800 border-gray-700">
-                {availabilityOptions.map((option) => (
-                  <SelectItem key={option} value={option} className="text-gray-300 focus:bg-gray-700">
-                    {option}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.availability && <p className="text-red-400 text-xs">{errors.availability}</p>}
-          </div>
+        <div className="space-y-6 pt-4">
+          <PersonalInfoForm 
+            personalInfo={personalInfo}
+            onUpdate={updatePersonalInfo}
+            user={user ? { email: user.email, phone: user.phone } : undefined}
+          />
 
           {/* Action Buttons */}
           <div className="flex gap-3 pt-4">
             <Button 
               onClick={handleCancel}
               variant="outline"
-              className="flex-1 border-gray-700 text-gray-300 hover:bg-gray-800"
+              className="flex-1 border-emerald-200 text-emerald-600 hover:bg-emerald-50 dark:border-emerald-800 dark:text-emerald-400 dark:hover:bg-emerald-900/20"
+              disabled={isLoading}
             >
               <X size={16} className="mr-2" />
               Cancel
             </Button>
             <Button 
               onClick={handleSave}
-              className="flex-1 bg-emerald-600 hover:bg-emerald-700"
+              className={`flex-1 font-medium transition-all duration-300 shadow-lg ${
+                isPersonalInfoComplete() && !isLoading
+                  ? 'bg-emerald-600 hover:bg-emerald-700 text-white hover:scale-105 hover:shadow-xl'
+                  : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+              }`}
+              disabled={isLoading || !isPersonalInfoComplete()}
             >
               <Save size={16} className="mr-2" />
-              Save Changes
+              {isLoading ? "Saving..." : "Save Changes"}
             </Button>
           </div>
         </div>

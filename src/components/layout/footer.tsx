@@ -1,13 +1,13 @@
 import Link from "next/link"
 import { BriefcaseBusiness, Instagram, Twitter, Facebook, Github, Linkedin } from "lucide-react"
-import { getDictionary } from "@/lib/dictionary"
+import { getCoreTranslations } from "@/lib/dictionary"
 
 interface FooterProps {
   lang: string
 }
 
-export function Footer({ lang }: FooterProps) {
-  const dictionary = getDictionary(lang)
+export async function Footer({ lang }: FooterProps) {
+  const dictionary = await getCoreTranslations(lang)
 
   return (
     <footer className="border-t bg-background relative">
@@ -21,101 +21,101 @@ export function Footer({ lang }: FooterProps) {
               <span className="text-xl font-bold tracking-tight">huntier</span>
             </div>
             <p className="text-sm text-muted-foreground mb-4 max-w-xs">
-              {dictionary.footer.description}
+              {dictionary.footer?.description}
             </p>
             <div className="flex gap-4">
               <Link href="#" className="text-muted-foreground hover:text-emerald-600 transition-colors">
                 <Twitter className="h-5 w-5" />
-                <span className="sr-only">{dictionary.footer.social?.twitter || "Twitter"}</span>
+                <span className="sr-only">{dictionary.footer?.social?.twitter || "Twitter"}</span>
               </Link>
               <Link href="#" className="text-muted-foreground hover:text-emerald-600 transition-colors">
                 <Linkedin className="h-5 w-5" />
-                <span className="sr-only">{dictionary.footer.social?.linkedin || "LinkedIn"}</span>
+                <span className="sr-only">{dictionary.footer?.social?.linkedin || "LinkedIn"}</span>
               </Link>
               <Link href="#" className="text-muted-foreground hover:text-emerald-600 transition-colors">
                 <Instagram className="h-5 w-5" />
-                <span className="sr-only">{dictionary.footer.social?.instagram || "Instagram"}</span>
+                <span className="sr-only">{dictionary.footer?.social?.instagram || "Instagram"}</span>
               </Link>
               <Link href="#" className="text-muted-foreground hover:text-emerald-600 transition-colors">
                 <Github className="h-5 w-5" />
-                <span className="sr-only">{dictionary.footer.social?.github || "GitHub"}</span>
+                <span className="sr-only">{dictionary.footer?.social?.github || "GitHub"}</span>
               </Link>
             </div>
           </div>
           
           <div>
-            <h3 className="font-semibold mb-4">{dictionary.footer.services}</h3>
+            <h3 className="font-semibold mb-4">{dictionary.footer?.services}</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href={`/${lang}/jobs`} className="text-muted-foreground hover:text-emerald-600 transition-colors">
-                  {dictionary.footer.jobSearch}
+                  {dictionary.footer?.jobSearch}
                 </Link>
               </li>
               <li>
                 <Link href="#" className="text-muted-foreground hover:text-emerald-600 transition-colors">
-                  {dictionary.footer.careerGuidance}
+                  {dictionary.footer?.careerGuidance}
                 </Link>
               </li>
               <li>
                 <Link href="#" className="text-muted-foreground hover:text-emerald-600 transition-colors">
-                  {dictionary.footer.skillAssessment}
+                  {dictionary.footer?.skillAssessment}
                 </Link>
               </li>
               <li>
                 <Link href="#" className="text-muted-foreground hover:text-emerald-600 transition-colors">
-                  {dictionary.footer.resumeBuilder}
+                  {dictionary.footer?.resumeBuilder}
                 </Link>
               </li>
             </ul>
           </div>
           
           <div>
-            <h3 className="font-semibold mb-4">{dictionary.footer.company}</h3>
+            <h3 className="font-semibold mb-4">{dictionary.footer?.company}</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href={`/${lang}/about`} className="text-muted-foreground hover:text-emerald-600 transition-colors">
-                  {dictionary.footer.aboutUs}
+                  {dictionary.footer?.aboutUs}
                 </Link>
               </li>
               <li>
                 <Link href="#" className="text-muted-foreground hover:text-emerald-600 transition-colors">
-                  {dictionary.footer.careers}
+                  {dictionary.footer?.careers}
                 </Link>
               </li>
               <li>
                 <Link href="#" className="text-muted-foreground hover:text-emerald-600 transition-colors">
-                  {dictionary.footer.press}
+                  {dictionary.footer?.press}
                 </Link>
               </li>
               <li>
                 <Link href="#" className="text-muted-foreground hover:text-emerald-600 transition-colors">
-                  {dictionary.footer.blog}
+                  {dictionary.footer?.blog}
                 </Link>
               </li>
             </ul>
           </div>
           
           <div>
-            <h3 className="font-semibold mb-4">{dictionary.footer.legal}</h3>
+            <h3 className="font-semibold mb-4">{dictionary.footer?.legal}</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="#" className="text-muted-foreground hover:text-emerald-600 transition-colors">
-                  {dictionary.footer.termsOfService}
+                  {dictionary.footer?.termsOfService}
                 </Link>
               </li>
               <li>
                 <Link href="#" className="text-muted-foreground hover:text-emerald-600 transition-colors">
-                  {dictionary.footer.privacy}
+                  {dictionary.footer?.privacy}
                 </Link>
               </li>
               <li>
                 <Link href="#" className="text-muted-foreground hover:text-emerald-600 transition-colors">
-                  {dictionary.footer.cookies}
+                  {dictionary.footer?.cookies}
                 </Link>
               </li>
               <li>
                 <Link href="#" className="text-muted-foreground hover:text-emerald-600 transition-colors">
-                  {dictionary.footer.licensing}
+                  {dictionary.footer?.licensing}
                 </Link>
               </li>
             </ul>
@@ -124,17 +124,17 @@ export function Footer({ lang }: FooterProps) {
         
         <div className="border-t pt-6 flex flex-col sm:flex-row items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            {dictionary.footer.copyright.replace("{year}", new Date().getFullYear().toString())}
+            {dictionary.footer?.copyright?.replace("{year}", new Date().getFullYear().toString())}
           </p>
           <div className="flex gap-4 mt-4 sm:mt-0">
             <Link href="#" className="text-xs hover:text-emerald-600 transition-colors text-muted-foreground">
-              {dictionary.footer.sitemap}
+              {dictionary.footer?.sitemap}
             </Link>
             <Link href="#" className="text-xs hover:text-emerald-600 transition-colors text-muted-foreground">
-              {dictionary.footer.accessibility}
+              {dictionary.footer?.accessibility}
             </Link>
             <Link href="#" className="text-xs hover:text-emerald-600 transition-colors text-muted-foreground">
-              {dictionary.footer.doNotSell}
+              {dictionary.footer?.doNotSell}
             </Link>
           </div>
         </div>

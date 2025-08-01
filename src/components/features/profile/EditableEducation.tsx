@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
@@ -10,6 +11,7 @@ interface Education {
   degree: string;
   institution: string;
   period: string;
+  isEmpty?: boolean;
 }
 
 interface EditableEducationProps {
@@ -21,6 +23,21 @@ interface EditableEducationProps {
 export function EditableEducation({ initialEducation, onSave, dictionary }: EditableEducationProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [education, setEducation] = useState<Education[]>(initialEducation);
+
+  // Update local state when initialEducation prop changes
+  React.useEffect(() => {
+    if (!isEditing) {
+      setEducation(initialEducation);
+    }
+  }, [initialEducation, isEditing]);
+
+  const handleEditStart = () => {
+    // If we have empty state templates, start with a clean empty entry
+    if (initialEducation.length === 1 && initialEducation[0].isEmpty) {
+      setEducation([{ degree: '', institution: '', period: '' }]);
+    }
+    setIsEditing(true);
+  };
 
   const handleSave = () => {
     // Validate that all required fields are filled
@@ -68,7 +85,7 @@ export function EditableEducation({ initialEducation, onSave, dictionary }: Edit
             <Button 
               size="sm" 
               className="h-7 px-2 text-xs bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600"
-              onClick={() => setIsEditing(true)}
+              onClick={handleEditStart}
             >
               <Edit size={12} className="mr-1" />
               {dictionary?.profile?.buttons?.edit || 'Edit'}

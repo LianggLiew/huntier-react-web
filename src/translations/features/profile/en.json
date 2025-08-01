@@ -19,6 +19,19 @@
     "add": "Add",
     "delete": "Delete"
   },
+  "applicationStatus": {
+    "checking": "Checking...",
+    "pending": "Applied - Pending",
+    "reviewing": "Under Review", 
+    "interviewed": "Interviewed",
+    "accepted": "Congratulations!",
+    "rejected": "Not Selected",
+    "applied": "Applied",
+    "review": "Review",
+    "interview": "Interview",
+    "acceptedShort": "Accepted",
+    "rejectedShort": "Rejected"
+  },
   "sections": {
     "about": "About",
     "experience": "Experience",
@@ -56,7 +69,10 @@
     "desiredSalary": "Desired Salary",
     "industries": "Industries",
     "remotePreference": "Remote Preference",
-    "cv": "CV"
+    "cv": "My Resume",
+    "resume": "Resume",
+    "uploadResume": "Upload Resume",
+    "downloadResume": "Download Resume"
   },
   "toast": {
     "aboutUpdated": "About section updated",
@@ -74,6 +90,10 @@
     "personalInfoUpdated": "Personal info updated",
     "personalInfoDescription": "Your personal information has been saved successfully.",
     "profilePictureUpdated": "Profile picture updated",
-    "profilePictureDescription": "Your profile picture has been updated successfully."
+    "profilePictureDescription": "Your profile picture has been updated successfully.",
+    "resumeUploaded": "Resume uploaded",
+    "resumeUploadedDescription": "Your resume has been uploaded successfully.",
+    "resumeDownloaded": "Resume downloaded",
+    "resumeDownloadedDescription": "Your resume has been downloaded successfully."
   }
 }
