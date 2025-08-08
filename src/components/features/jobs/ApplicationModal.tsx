@@ -75,8 +75,8 @@ export function ApplicationModal({
   const { uploadResume, isUploading, triggerFileSelect, fileInputRef } = useResumeUpload({
     showToasts: false,
     onSuccess: (result) => {
-      if (result.data?.url) {
-        setFormData(prev => ({ ...prev, customResumeUrl: result.data.url }))
+      if (result.data?.fileUrl) {
+        setFormData(prev => ({ ...prev, customResumeUrl: result.data.fileUrl }))
         setUploadSuccess(true)
         setTimeout(() => setUploadSuccess(false), 3000)
       }

@@ -2,11 +2,20 @@
   "title": "通过",
   "titleHighlight": "AI 驱动",
   "titleEnd": "匹配找到理想工作",
-  "subtitle": "Huntier 使用先进的人工智能技术，将您的技能和偏好与完美的工作机会相匹配。获取个性化推荐，自信申请。",
+  "subtitle": "瀚拓为跨国企业和专业人士提供端到端人力资源解决方案，打破地域障碍，构建人工智能驱动的高效生态系统。",
   "findJobsButton": "寻找工作",
   "viewProfileButton": "查看我的简历",
   "signInButton": "登录",
   "feature1": "AI 驱动匹配",
   "feature2": "10,000+ 个工作",
-  "feature3": "免费使用"
+  "feature3": "免费使用",
+  "ambassador": {
+    "title": "加入瀚拓成为",
+    "titleHighlight": "校园大使",
+    "subtitle": "在您的校园代表瀚拓，解锁专属机会。建立您的人际网络，培养领导技能，提前获得尖端职业工具的使用权，同时在您的大学社区中产生真正的影响。",
+    "becomeAmbassadorButton": "成为大使",
+    "learnMoreButton": "了解更多",
+    "limitedSpots": "名额有限",
+    "applyNow": "立即申请专属访问权限"
+  }
 }

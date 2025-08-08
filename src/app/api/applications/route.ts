@@ -66,6 +66,21 @@ export async function POST(request: NextRequest) {
 
     const { jobId, coverLetter, customResumeUrl, applicantInfo } = validationResult2.data
 
+    // If no custom resume URL provided, get user's primary resume from user_resumes table
+    let finalResumeUrl = customResumeUrl
+    if (!customResumeUrl) {
+      const { data: resumeData } = await supabaseAdmin
+        .from('user_resumes')
+        .select('file_url')
+        .eq('user_id', userId)
+        .eq('is_primary', true)
+        .single()
+      
+      if (resumeData?.file_url) {
+        finalResumeUrl = resumeData.file_url
+      }
+    }
+
     // Check if job exists
     const { data: jobData, error: jobError } = await supabaseAdmin
       .from('jobs')
@@ -103,7 +118,7 @@ export async function POST(request: NextRequest) {
       job_id: jobId,
       status: 'pending',
       cover_letter: coverLetter,
-      custom_resume_url: customResumeUrl || null,
+      custom_resume_url: finalResumeUrl || null,
       // Applicant snapshot data
       applicant_first_name: applicantInfo.firstName,
       applicant_last_name: applicantInfo.lastName,

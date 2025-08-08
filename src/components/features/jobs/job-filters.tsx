@@ -20,10 +20,9 @@ interface JobFiltersProps {
   onFiltersChange: (filters: JobFilters) => void
   onClearFilters: () => void
   onClose?: () => void
-  isMobile?: boolean
 }
 
-export function JobFiltersPanel({ filters, onFiltersChange, onClearFilters, onClose, isMobile }: JobFiltersProps) {
+export function JobFiltersPanel({ filters, onFiltersChange, onClearFilters, onClose }: JobFiltersProps) {
   const [localFilters, setLocalFilters] = useState<JobFilters>(filters)
 
   // Sync local filters when external filters change (e.g., when cleared)
@@ -34,7 +33,7 @@ export function JobFiltersPanel({ filters, onFiltersChange, onClearFilters, onCl
   const jobTypes = [
     { value: 'full-time', label: 'Full Time' },
     { value: 'part-time', label: 'Part Time' },
-    { value: 'contract', label: 'Contract' },
+    { value: 'intern', label: 'Intern' },
     { value: 'remote', label: 'Remote' }
   ] as const
 
@@ -55,7 +54,7 @@ export function JobFiltersPanel({ filters, onFiltersChange, onClearFilters, onCl
     onFiltersChange(updatedFilters)
   }
 
-  const handleTypeChange = (type: 'full-time' | 'part-time' | 'contract' | 'remote', checked: boolean) => {
+  const handleTypeChange = (type: 'full-time' | 'part-time' | 'intern' | 'remote', checked: boolean) => {
     const currentTypes = localFilters.type || []
     const updatedTypes = checked 
       ? [...currentTypes, type]
@@ -75,52 +74,72 @@ export function JobFiltersPanel({ filters, onFiltersChange, onClearFilters, onCl
   )
 
   return (
-    <div className={cn("space-y-6", isMobile ? "w-full" : "w-80", "fixed top-44")}>
-      <Card className="max-h-[calc(100vh-16rem)] overflow-y-auto">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Filter className="w-5 h-5" />
-              Filters
-            </CardTitle>
-            <div className="flex items-center gap-2">
-              {hasActiveFilters && (
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={onClearFilters}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <X className="w-4 h-4 mr-1" />
-                  Clear
-                </Button>
-              )}
-              {!isMobile && onClose && (
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={onClose}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              )}
+    <div className="w-full lg:w-80 lg:space-y-6 lg:fixed lg:top-44">
+      <Card className="border-0 shadow-none max-h-none overflow-visible lg:border lg:shadow-sm lg:max-h-[calc(100vh-16rem)] lg:overflow-y-auto">
+        <div className="hidden lg:block">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Filter className="w-5 h-5" />
+                Filters
+              </CardTitle>
+              <div className="flex items-center gap-2">
+                {hasActiveFilters && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={onClearFilters}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    <X className="w-4 h-4 mr-1" />
+                    Clear
+                  </Button>
+                )}
+                {onClose && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={onClose}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                )}
+              </div>
             </div>
+          </CardHeader>
+        </div>
+        <CardContent className="space-y-4 lg:space-y-8 px-0 lg:px-6">
+          {/* Clear all button for mobile */}
+          <div className="lg:hidden">
+            {hasActiveFilters && (
+              <Button 
+                variant="outline" 
+                onClick={onClearFilters}
+                className="w-full mb-4 lg:mb-8 h-10 lg:h-14 text-sm lg:text-lg font-medium"
+              >
+                <X className="w-4 h-4 lg:w-5 lg:h-5 mr-2 lg:mr-3" />
+                Clear All Filters
+              </Button>
+            )}
           </div>
-        </CardHeader>
-        <CardContent className="space-y-6">
+          
           {/* Job Type */}
-          <div className="space-y-3">
-            <Label className="text-sm font-medium">Job Type</Label>
-            <div className="space-y-2">
+          <div className="space-y-3 lg:space-y-4">
+            <Label className="text-sm lg:text-sm font-medium lg:font-medium">Job Type</Label>
+            <div className="space-y-2 lg:space-y-3">
               {jobTypes.map((type) => (
-                <div key={type.value} className="flex items-center space-x-2">
+                <div key={type.value} className="flex items-center space-x-3 lg:space-x-3">
                   <Checkbox
                     id={type.value}
                     checked={localFilters.type?.includes(type.value) || false}
                     onCheckedChange={(checked) => handleTypeChange(type.value, checked as boolean)}
+                    className="h-5 w-5 lg:h-4 lg:w-4"
                   />
-                  <Label htmlFor={type.value} className="text-sm">
+                  <Label 
+                    htmlFor={type.value} 
+                    className="text-sm lg:text-sm cursor-pointer"
+                  >
                     {type.label}
                   </Label>
                 </div>
@@ -131,9 +150,9 @@ export function JobFiltersPanel({ filters, onFiltersChange, onClearFilters, onCl
           <Separator />
 
           {/* Salary Range */}
-          <div className="space-y-3">
-            <Label className="text-sm font-medium">Salary Range (USD)</Label>
-            <div className="px-2">
+          <div className="space-y-3 lg:space-y-4">
+            <Label className="text-sm lg:text-sm font-medium lg:font-medium">Salary Range (USD)</Label>
+            <div className="px-2 lg:px-2">
               <Slider
                 value={[localFilters.salaryRange?.min || 0, localFilters.salaryRange?.max || 200000]}
                 max={200000}
@@ -144,7 +163,7 @@ export function JobFiltersPanel({ filters, onFiltersChange, onClearFilters, onCl
                   handleFilterChange('salaryRange', { min: value[0], max: value[1] })
                 }
               />
-              <div className="flex justify-between text-xs text-gray-500 mt-1">
+              <div className="flex justify-between text-gray-500 mt-2 lg:mt-2 text-xs lg:text-xs">
                 <span>${(localFilters.salaryRange?.min || 0).toLocaleString()}</span>
                 <span>${(localFilters.salaryRange?.max || 200000).toLocaleString()}</span>
               </div>
@@ -154,22 +173,36 @@ export function JobFiltersPanel({ filters, onFiltersChange, onClearFilters, onCl
           <Separator />
 
           {/* Categories */}
-          <div className="space-y-3">
-            <Label className="text-sm font-medium">Categories</Label>
-            <div className="space-y-2 max-h-48 overflow-y-auto">
+          <div className="space-y-3 lg:space-y-4">
+            <Label className="text-sm lg:text-sm font-medium lg:font-medium">Categories</Label>
+            <div className="space-y-2 lg:space-y-3 overflow-y-auto max-h-40 lg:max-h-48">
               {categories.map((category) => (
-                <div key={category} className="flex items-center space-x-2">
+                <div key={category} className="flex items-center space-x-3 lg:space-x-3">
                   <Checkbox
                     id={category}
                     checked={localFilters.category === category || false}
                     onCheckedChange={(checked) => handleCategoryChange(category, checked as boolean)}
+                    className="h-5 w-5 lg:h-4 lg:w-4"
                   />
-                  <Label htmlFor={category} className="text-sm">
+                  <Label 
+                    htmlFor={category} 
+                    className="cursor-pointer text-sm lg:text-sm"
+                  >
                     {category}
                   </Label>
                 </div>
               ))}
             </div>
+          </div>
+          
+          {/* Apply button for mobile */}
+          <div className="lg:hidden pt-4 lg:pt-6">
+            <Button 
+              onClick={onClose}
+              className="w-full h-10 lg:h-14 text-sm lg:text-lg font-semibold"
+            >
+              Apply Filters
+            </Button>
           </div>
         </CardContent>
       </Card>

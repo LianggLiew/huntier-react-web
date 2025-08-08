@@ -1,13 +1,14 @@
 {
   "navbar": {
     "findJobs": "Find Jobs",
+    "jobs": "Jobs",
     "companies": "Companies", 
     "resources": "Resources",
     "about": "About",
     "myProfile": "My Profile"
   },
   "footer": {
-    "description": "AI-powered job matching platform connecting talented professionals with their dream opportunities.",
+    "description": "Huntier offers AI-powered cross-border HR solutions, streamlining global recruitment, connecting skilled professionals, and linking businesses with local partners for efficient market entry.",
     "services": "Services",
     "jobSearch": "Job Search",
     "careerGuidance": "Career Guidance",
@@ -23,10 +24,8 @@
     "privacy": "Privacy",
     "cookies": "Cookies",
     "licensing": "Licensing",
-    "copyright": "© {year} Huntier Inc. All rights reserved.",
-    "sitemap": "Sitemap",
-    "accessibility": "Accessibility",
-    "doNotSell": "Do Not Sell My Info",
+    "copyright": "© {year} Huntier Artificial Intelligence Technology Sdn. Bhd.",
+    "homepage": "Home",
     "social": {
       "twitter": "Twitter",
       "linkedin": "LinkedIn", 
@@ -45,5 +44,21 @@
     "interviews": "Interviews",
     "points": "Points",
     "profile": "Profile"
+  },
+  "comingSoon": {
+    "title": "Coming Soon!",
+    "description": "The {feature} feature is currently under development and will be available soon.",
+    "benefits": "This feature will help enhance your job search experience with powerful tools and insights.",
+    "action": "Got it!"
+  },
+  "auth": {
+    "welcome": "Welcome back!",
+    "login": "Login",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "loginButton": "Login",
+    "noAccount": "Don't have an account?",
+    "signUp": "Sign up"
   }
 }

@@ -1,12 +1,14 @@
 import { supabaseAdmin } from './supabase'
 import { cleanupExpiredBlacklist } from './blacklist'
 import { cleanupExpiredOtps } from './otp-final'
+import { cleanupExpiredTokens } from './auth'
 
 export interface CleanupResult {
   success: boolean
   summary: {
     expiredOtps: number
     expiredBlacklist: number
+    expiredTokens: number
     oldUsers: number
     totalCleaned: number
   }
@@ -17,6 +19,7 @@ export interface CleanupConfig {
   // How old records should be before cleanup
   otpRetentionDays: number
   blacklistRetentionDays: number
+  refreshTokenRetentionDays: number
   userRetentionDays: number
   
   // Batch sizes for cleanup operations
@@ -29,6 +32,7 @@ export interface CleanupConfig {
 export const DEFAULT_CLEANUP_CONFIG: CleanupConfig = {
   otpRetentionDays: 7,        // Keep OTP records for 7 days
   blacklistRetentionDays: 30, // Keep expired blacklist for 30 days
+  refreshTokenRetentionDays: 1, // Clean expired refresh tokens after 1 day
   userRetentionDays: 90,      // Keep unused users for 90 days
   batchSize: 100,
   cleanupUsers: false         // Don't auto-cleanup users by default
@@ -43,6 +47,7 @@ export async function performCleanup(
   const errors: string[] = []
   let expiredOtps = 0
   let expiredBlacklist = 0
+  let expiredTokens = 0
   let oldUsers = 0
 
   try {
@@ -97,7 +102,34 @@ export async function performCleanup(
       errors.push(errorMsg)
     }
 
-    // 5. Clean up unused users (optional)
+    // 5. Clean up expired refresh tokens
+    console.log('  Cleaning expired refresh tokens...')
+    try {
+      const expiredRefreshTokens = await cleanupExpiredTokens()
+      console.log(`  ✅ Cleaned ${expiredRefreshTokens.deletedCount || 0} expired refresh tokens`)
+      expiredTokens = expiredRefreshTokens.deletedCount || 0
+    } catch (error) {
+      const errorMsg = `Failed to cleanup expired refresh tokens: ${error}`
+      console.error(`  ❌ ${errorMsg}`)
+      errors.push(errorMsg)
+    }
+
+    // 6. Clean up old refresh token records (beyond retention period)
+    console.log('  Cleaning old refresh token records...')
+    try {
+      const oldTokenCount = await cleanupOldRefreshTokens(
+        config.refreshTokenRetentionDays, 
+        config.batchSize
+      )
+      console.log(`  ✅ Cleaned ${oldTokenCount} old refresh token records`)
+      expiredTokens += oldTokenCount
+    } catch (error) {
+      const errorMsg = `Failed to cleanup old refresh token records: ${error}`
+      console.error(`  ❌ ${errorMsg}`)
+      errors.push(errorMsg)
+    }
+
+    // 7. Clean up unused users (optional)
     if (config.cleanupUsers) {
       console.log('  Cleaning unused users...')
       try {
@@ -110,7 +142,7 @@ export async function performCleanup(
       }
     }
 
-    const totalCleaned = expiredOtps + expiredBlacklist + oldUsers
+    const totalCleaned = expiredOtps + expiredBlacklist + expiredTokens + oldUsers
     console.log(`🎉 Cleanup completed. Total records cleaned: ${totalCleaned}`)
 
     return {
@@ -118,6 +150,7 @@ export async function performCleanup(
       summary: {
         expiredOtps,
         expiredBlacklist,
+        expiredTokens,
         oldUsers,
         totalCleaned
       },
@@ -131,8 +164,9 @@ export async function performCleanup(
       summary: {
         expiredOtps,
         expiredBlacklist,
+        expiredTokens,
         oldUsers,
-        totalCleaned: expiredOtps + expiredBlacklist + oldUsers
+        totalCleaned: expiredOtps + expiredBlacklist + expiredTokens + oldUsers
       },
       errors: [...errors, `Cleanup process failed: ${error}`]
     }
@@ -257,6 +291,40 @@ async function cleanupUnusedUsers(retentionDays: number, batchSize: number): Pro
 }
 
 /**
+ * Clean up old refresh token records beyond retention period
+ */
+async function cleanupOldRefreshTokens(retentionDays: number, batchSize: number): Promise<number> {
+  const cutoffDate = new Date()
+  cutoffDate.setDate(cutoffDate.getDate() - retentionDays)
+
+  let totalCleaned = 0
+  let hasMore = true
+
+  while (hasMore) {
+    const { data, error } = await supabaseAdmin
+      .from('refresh_tokens')
+      .delete()
+      .lt('expires_at', cutoffDate.toISOString())
+      .select('id')
+      .limit(batchSize)
+
+    if (error) {
+      throw new Error(error.message)
+    }
+
+    const cleaned = data?.length || 0
+    totalCleaned += cleaned
+    hasMore = cleaned === batchSize
+
+    if (cleaned > 0) {
+      console.log(`    Cleaned batch of ${cleaned} old refresh token records`)
+    }
+  }
+
+  return totalCleaned
+}
+
+/**
  * Get cleanup statistics without performing cleanup
  */
 export async function getCleanupStats(
@@ -266,6 +334,8 @@ export async function getCleanupStats(
   oldOtps: number
   expiredBlacklist: number
   oldBlacklist: number
+  expiredTokens: number
+  oldTokens: number
   unusedUsers: number
 }> {
   const now = new Date().toISOString()
@@ -275,10 +345,13 @@ export async function getCleanupStats(
   const blacklistCutoff = new Date()
   blacklistCutoff.setDate(blacklistCutoff.getDate() - config.blacklistRetentionDays)
 
+  const tokenCutoff = new Date()
+  tokenCutoff.setDate(tokenCutoff.getDate() - config.refreshTokenRetentionDays)
+
   const userCutoff = new Date()
   userCutoff.setDate(userCutoff.getDate() - config.userRetentionDays)
 
-  const [expiredOtps, oldOtps, expiredBlacklist, oldBlacklist, unusedUsers] = await Promise.all([
+  const [expiredOtps, oldOtps, expiredBlacklist, oldBlacklist, expiredTokens, oldTokens, unusedUsers] = await Promise.all([
     // Expired OTPs
     supabaseAdmin
       .from('otp_codes')
@@ -304,6 +377,18 @@ export async function getCleanupStats(
       .select('id', { count: 'exact', head: true })
       .lt('expires_at', blacklistCutoff.toISOString()),
 
+    // Expired refresh tokens
+    supabaseAdmin
+      .from('refresh_tokens')
+      .select('id', { count: 'exact', head: true })
+      .lt('expires_at', now),
+
+    // Old refresh tokens
+    supabaseAdmin
+      .from('refresh_tokens')
+      .select('id', { count: 'exact', head: true })
+      .lt('expires_at', tokenCutoff.toISOString()),
+
     // Unused users
     supabaseAdmin
       .from('users')
@@ -316,6 +401,8 @@ export async function getCleanupStats(
     oldOtps: oldOtps.count || 0,
     expiredBlacklist: expiredBlacklist.count || 0,
     oldBlacklist: oldBlacklist.count || 0,
+    expiredTokens: expiredTokens.count || 0,
+    oldTokens: oldTokens.count || 0,
     unusedUsers: unusedUsers.count || 0
   }
 }

@@ -1,0 +1,186 @@
+{
+  "title": "Privacy Policy",
+  "lastUpdated": "Last updated: {date}",
+  "backToHome": "Back to Home",
+  "sections": {
+    "introduction": {
+      "title": "Introduction",
+      "content": [
+        "At Huntier, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our AI-powered HR platform.",
+        "By using our service, you consent to the collection and use of information in accordance with this policy."
+      ]
+    },
+    "informationWeCollect": {
+      "title": "Information We Collect",
+      "personalInfo": {
+        "title": "Personal Information",
+        "items": [
+          "Name, email address, and phone number",
+          "Professional information (work experience, education, skills)",
+          "Resume and CV documents",
+          "Job preferences and career goals",
+          "Profile photos and other uploaded content"
+        ]
+      },
+      "automaticInfo": {
+        "title": "Automatically Collected Information",
+        "items": [
+          "IP address and browser information",
+          "Device information and operating system",
+          "Usage patterns and interaction data",
+          "Cookies and similar tracking technologies",
+          "Location data (with your consent)"
+        ]
+      },
+      "aiGeneratedData": {
+        "title": "AI-Generated Data",
+        "items": [
+          "Resume optimization suggestions and improvements",
+          "Mock interview responses and performance analytics",
+          "Job matching recommendations and compatibility scores",
+          "Career guidance and skill assessment results"
+        ]
+      }
+    },
+    "howWeUse": {
+      "title": "How We Use Your Information",
+      "intro": "We use your information to:",
+      "purposes": [
+        "Provide and maintain our job search and recruitment services",
+        "Deliver AI-powered resume optimization and interview preparation",
+        "Match you with relevant job opportunities",
+        "Communicate with you about our services and updates",
+        "Improve our AI algorithms and platform functionality",
+        "Ensure security and prevent fraudulent activity",
+        "Comply with legal obligations and enforce our terms"
+      ]
+    },
+    "aiProcessing": {
+      "title": "AI and Machine Learning Processing",
+      "intro": "Our AI services process your data to provide personalized recommendations:",
+      "services": [
+        {
+          "name": "Resume Analysis:",
+          "description": "We analyze your resume content to suggest improvements and optimize formatting"
+        },
+        {
+          "name": "Interview Simulation:",
+          "description": "We process your responses to provide feedback and improvement suggestions"
+        },
+        {
+          "name": "Job Matching:",
+          "description": "We use your profile data to recommend relevant job opportunities"
+        },
+        {
+          "name": "Skill Assessment:",
+          "description": "We evaluate your skills and experience to provide career guidance"
+        }
+      ],
+      "disclaimer": "All AI processing is designed to benefit you directly and improve your job search experience. We do not use your data to train general AI models without your explicit consent."
+    },
+    "informationSharing": {
+      "title": "Information Sharing and Disclosure",
+      "intro": "We do not sell your personal information. We may share your information in the following circumstances:",
+      "circumstances": [
+        {
+          "type": "With Your Consent:",
+          "description": "When you authorize us to share information with potential employers"
+        },
+        {
+          "type": "Service Providers:",
+          "description": "With trusted third-party services that help us operate our platform"
+        },
+        {
+          "type": "Legal Requirements:",
+          "description": "When required by law or to protect our rights and safety"
+        },
+        {
+          "type": "Business Transfers:",
+          "description": "In connection with mergers, acquisitions, or asset sales"
+        },
+        {
+          "type": "Anonymized Data:",
+          "description": "We may share aggregated, non-personally identifiable information for research purposes"
+        }
+      ]
+    },
+    "dataSecurity": {
+      "title": "Data Security",
+      "intro": "We implement industry-standard security measures to protect your information:",
+      "measures": [
+        "Encryption of data in transit and at rest",
+        "Regular security audits and vulnerability assessments",
+        "Access controls and authentication measures",
+        "Secure cloud infrastructure with trusted providers",
+        "Employee training on data protection and privacy"
+      ]
+    },
+    "yourRights": {
+      "title": "Your Privacy Rights",
+      "intro": "You have the following rights regarding your personal information:",
+      "rights": [
+        {
+          "right": "Access:",
+          "description": "Request copies of your personal data"
+        },
+        {
+          "right": "Correction:",
+          "description": "Request correction of inaccurate or incomplete data"
+        },
+        {
+          "right": "Deletion:",
+          "description": "Request deletion of your personal data (subject to certain exceptions)"
+        },
+        {
+          "right": "Portability:",
+          "description": "Request transfer of your data in a structured, machine-readable format"
+        },
+        {
+          "right": "Objection:",
+          "description": "Object to certain types of processing"
+        },
+        {
+          "right": "Restriction:",
+          "description": "Request restriction of processing under certain circumstances"
+        }
+      ]
+    },
+    "cookies": {
+      "title": "Cookies and Tracking Technologies",
+      "intro": "We use cookies and similar technologies to:",
+      "purposes": [
+        "Remember your preferences and settings",
+        "Analyze site traffic and usage patterns",
+        "Provide personalized content and recommendations",
+        "Maintain security and prevent fraud"
+      ],
+      "control": "You can control cookie settings through your browser preferences. However, disabling certain cookies may limit some functionality of our service."
+    },
+    "internationalTransfers": {
+      "title": "International Data Transfers",
+      "content": "As a global platform, we may transfer your information to countries outside your residence. We ensure appropriate safeguards are in place to protect your data during international transfers, including standard contractual clauses and adequacy decisions where applicable."
+    },
+    "dataRetention": {
+      "title": "Data Retention",
+      "content": "We retain your personal information for as long as necessary to provide our services and fulfill the purposes outlined in this policy. When you delete your account, we will delete or anonymize your personal information within 30 days, except where retention is required by law."
+    },
+    "changes": {
+      "title": "Changes to This Privacy Policy",
+      "content": "We may update this Privacy Policy from time to time. We will notify you of any material changes by posting the new policy on this page and updating the \"Last updated\" date. We encourage you to review this policy periodically for any changes."
+    },
+    "contact": {
+      "title": "Contact Us",
+      "intro": "If you have any questions about this Privacy Policy or wish to exercise your privacy rights, please contact us:",
+      "email": "Email:",
+      "phone": "Phone:",
+      "address": "Address:"
+    }
+  },
+  "footer": {
+    "copyright": "© {year} Huntier Inc. All rights reserved.",
+    "links": {
+      "terms": "Terms of Service",
+      "privacy": "Privacy Policy"
+    }
+  }
+}

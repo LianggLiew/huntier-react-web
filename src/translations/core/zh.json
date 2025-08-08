@@ -1,6 +1,7 @@
 {
   "navbar": {
     "findJobs": "寻找工作",
+    "jobs": "求职",
     "companies": "公司",
     "resources": "资源", 
     "about": "关于我们",
@@ -23,10 +24,8 @@
     "privacy": "隐私政策",
     "cookies": "Cookie 政策",
     "licensing": "许可证",
-    "copyright": "© {year} Huntier Inc. 保留所有权利。",
-    "sitemap": "网站地图",
-    "accessibility": "无障碍访问",
-    "doNotSell": "不出售我的信息",
+    "copyright": "© {year} 上海瀊拓智能科技有限公司",
+    "homepage": "首页",
     "social": {
       "twitter": "推特",
       "linkedin": "领英",

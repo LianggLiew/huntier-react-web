@@ -18,6 +18,7 @@ interface ApplicationButtonProps {
   size?: 'sm' | 'md' | 'lg' | 'icon'
   onApplicationClick?: () => void
   className?: string
+  refreshTrigger?: number // Add trigger to force status refresh
 }
 
 export function ApplicationButton({ 
@@ -26,7 +27,8 @@ export function ApplicationButton({
   variant = 'button',
   size = 'md',
   onApplicationClick,
-  className 
+  className,
+  refreshTrigger
 }: ApplicationButtonProps) {
   const [applicationStatus, setApplicationStatus] = useState<ApplicationStatus | null>(null)
   const { isAuthenticated } = useAuth()
@@ -39,10 +41,14 @@ export function ApplicationButton({
         setApplicationStatus(status)
       })
     }
-  }, [jobId, isAuthenticated, checkApplicationStatus])
+  }, [jobId, isAuthenticated, checkApplicationStatus, refreshTrigger])
 
   const handleClick = () => {
     if (!isAuthenticated) {
+      // Store current page URL for redirect after authentication
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('huntier_redirect_after_auth', window.location.pathname)
+      }
       window.location.href = `/${lang}/verify-otp`
       return
     }
@@ -195,6 +201,42 @@ export function ApplicationButton({
 }
 
 // Quick status check function for use in job cards
+// Helper function to get status color for use in other components
+export function getStatusColor(status: ApplicationStatus): string {
+  switch (status) {
+    case 'pending':
+      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100'
+    case 'reviewing':
+      return 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100'
+    case 'interviewed':
+      return 'bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100'
+    case 'accepted':
+      return 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100'
+    case 'rejected':
+      return 'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100'
+    default:
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100'
+  }
+}
+
+// Helper function to get status icon
+export function getStatusIcon(status: ApplicationStatus) {
+  switch (status) {
+    case 'pending':
+      return <Clock3 className="w-3 h-3" />
+    case 'reviewing':
+      return <Eye className="w-3 h-3" />
+    case 'interviewed':
+      return <UserCheck className="w-3 h-3" />
+    case 'accepted':
+      return <CheckCircle className="w-3 h-3" />
+    case 'rejected':
+      return <XCircle className="w-3 h-3" />
+    default:
+      return null
+  }
+}
+
 export function getApplicationStatusBadge(status: ApplicationStatus | null, lang: string = 'en') {
   if (!status) return null
 

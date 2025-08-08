@@ -1,0 +1,96 @@
+{
+  "title": "Become a Campus Ambassador",
+  "subtitle": "Join Huntier's Campus Ambassador Program and make a difference at your university",
+  "description": "Help us revolutionize how students find career opportunities while developing your leadership skills and building your professional network.",
+  "form": {
+    "personalInfo": {
+      "title": "Personal Information",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "firstNamePlaceholder": "Enter your first name",
+      "lastNamePlaceholder": "Enter your last name",
+      "emailPlaceholder": "your.email@university.edu",
+      "phonePlaceholder": "+1 (555) 123-4567"
+    },
+    "academic": {
+      "title": "Academic Details",
+      "university": "University",
+      "major": "Major/Field of Study",
+      "graduationYear": "Expected Graduation Year",
+      "currentYear": "Current Academic Year",
+      "universityPlaceholder": "Enter your university name",
+      "majorPlaceholder": "Computer Science, Business, etc.",
+      "yearOptions": {
+        "freshman": "Freshman",
+        "sophomore": "Sophomore", 
+        "junior": "Junior",
+        "senior": "Senior",
+        "graduate": "Graduate Student"
+      }
+    },
+    "experience": {
+      "title": "Experience & Skills",
+      "leadership": "Leadership Experience",
+      "socialMedia": "Social Media Presence",
+      "skills": "Relevant Skills",
+      "leadershipPlaceholder": "Describe any leadership roles, club positions, volunteer work...",
+      "socialMediaPlaceholder": "Instagram, LinkedIn, TikTok follower counts or engagement rates...",
+      "skillsPlaceholder": "Marketing, Communication, Event Planning, Public Speaking..."
+    },
+    "motivation": {
+      "title": "Motivation & Goals",
+      "why": "Why do you want to become a Campus Ambassador?",
+      "contribute": "How would you promote Huntier on your campus?",
+      "goals": "What do you hope to achieve through this program?",
+      "whyPlaceholder": "Share your motivation for joining our ambassador program...",
+      "contributePlaceholder": "Describe your ideas for campus outreach, events, social media...",
+      "goalsPlaceholder": "What skills do you want to develop? What impact do you want to make?"
+    },
+    "availability": {
+      "title": "Availability & Commitment",
+      "timeCommitment": "How many hours per week can you dedicate?",
+      "duration": "How long can you commit to the program?",
+      "startDate": "When can you start?",
+      "timeOptions": {
+        "2-5": "2-5 hours/week",
+        "5-10": "5-10 hours/week",
+        "10+": "10+ hours/week"
+      },
+      "durationOptions": {
+        "semester": "One semester",
+        "year": "One academic year",
+        "flexible": "Flexible/Ongoing"
+      }
+    },
+    "submitButton": "Submit Application",
+    "submitting": "Submitting...",
+    "errors": {
+      "required": "This field is required",
+      "email": "Please enter a valid email address",
+      "phone": "Please enter a valid phone number"
+    }
+  },
+  "benefits": {
+    "title": "Program Benefits",
+    "items": [
+      "Early access to new features and beta testing",
+      "Exclusive networking events and mentorship opportunities",
+      "Leadership development and professional skills training",
+      "Portfolio building with real marketing experience",
+      "Letter of recommendation upon successful completion",
+      "Potential internship and job opportunities at Huntier"
+    ]
+  },
+  "requirements": {
+    "title": "Requirements",
+    "items": [
+      "Currently enrolled as a full-time student",
+      "Strong communication and social media skills",
+      "Passionate about career development and helping peers",
+      "Committed to program duration and activities",
+      "Maintain good academic standing"
+    ]
+  }
+}

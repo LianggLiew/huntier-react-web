@@ -15,7 +15,9 @@ const pageTranslationMap: Record<string, string> = {
   'profile': 'features/profile',
   'verify-otp': 'features/auth',
   'auth': 'features/auth',
-  'about': 'pages/about' // Add if about page translations exist
+  'about': 'pages/about', // Add if about page translations exist
+  'terms': 'pages/terms',
+  'privacy': 'pages/privacy'
 };
 
 // Load core translations (navbar, footer, navigation, language toggle)
@@ -111,6 +113,16 @@ export const getPageDictionary = async (page: string, locale: string): Promise<a
       ...core,
       onboarding: pageSpecific
     };
+  } else if (page === 'terms') {
+    return {
+      ...core,
+      terms: pageSpecific
+    };
+  } else if (page === 'privacy') {
+    return {
+      ...core,
+      privacy: pageSpecific
+    };
   }
 
   // Default: merge at root level
@@ -122,14 +134,16 @@ export const getPageDictionary = async (page: string, locale: string): Promise<a
 
 // Load all translations (for backward compatibility)
 export const loadAllTranslations = async (locale: string): Promise<any> => {
-  const [core, home, jobs, resources, onboarding, profile, auth] = await Promise.all([
+  const [core, home, jobs, resources, onboarding, profile, auth, terms, privacy] = await Promise.all([
     loadCoreTranslations(locale),
     loadPageTranslations('home', locale),
     loadPageTranslations('jobs', locale), 
     loadPageTranslations('resources', locale),
     loadPageTranslations('onboarding', locale),
     loadPageTranslations('profile', locale),
-    loadPageTranslations('auth', locale)
+    loadPageTranslations('auth', locale),
+    loadPageTranslations('terms', locale),
+    loadPageTranslations('privacy', locale)
   ]);
 
   return {
@@ -139,6 +153,8 @@ export const loadAllTranslations = async (locale: string): Promise<any> => {
     resources,
     onboarding,
     profile,
-    verifyOtp: auth
+    verifyOtp: auth,
+    terms,
+    privacy
   };
 };

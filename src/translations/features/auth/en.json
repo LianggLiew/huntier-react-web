@@ -1,6 +1,6 @@
 {
-  "verificationRequired": "Verification Required",
-  "passwordlessLogin": "Passwordless Login",
+  "verificationRequired": "Passwordless Verification",
+  "passwordlessLogin": "Welcome to Huntier",
   "verifyIdentity": "Verify your identity to access your account",
   "findJob": "I want to find a job",
   "wantToHire": "I want to hire",
@@ -24,8 +24,8 @@
   "termsOfService": "Terms of Service",
   "and": "and",
   "privacyPolicy": "Privacy Policy",
-  "customerService": "Customer Service: 400-065-5799 | Working Hours: 8:00-22:00",
-  "licenseInfo": "Human Resources Service License | Business License | Chaoyang District Social Bureau Supervision",
+  "customerService": "Support Hotline: +86-13857863960",
+  "licenseInfo": "Email: general@gohuntier.com",
   "errors": {
     "enterEmail": "Please enter your email address",
     "enterPhone": "Please enter your phone number",

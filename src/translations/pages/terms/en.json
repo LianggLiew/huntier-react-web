@@ -1,0 +1,91 @@
+{
+  "title": "Terms of Service",
+  "lastUpdated": "Last updated: {date}",
+  "backToHome": "Back to Home",
+  "sections": {
+    "agreement": {
+      "title": "Agreement to Terms",
+      "content": [
+        "By accessing and using Huntier (\"we,\" \"our,\" or \"us\"), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.",
+        "These Terms of Service govern your use of our AI-powered cross-border HR platform that connects skilled professionals with global opportunities."
+      ]
+    },
+    "serviceDescription": {
+      "title": "Service Description",
+      "intro": "Huntier provides an online platform that offers:",
+      "services": [
+        "Job search and application services",
+        "AI-powered resume optimization tools",
+        "AI mock interview preparation",
+        "Professional profile creation and management",
+        "Cross-border recruitment solutions",
+        "Career guidance and skill assessment tools"
+      ]
+    },
+    "userAccounts": {
+      "title": "User Accounts and Registration",
+      "intro": "To access certain features of our service, you must register for an account. You agree to:",
+      "requirements": [
+        "Provide accurate, current, and complete information during the registration process",
+        "Maintain the security of your password and identification",
+        "Notify us immediately of any unauthorized access to your account",
+        "Accept responsibility for all activities that occur under your account"
+      ]
+    },
+    "userConduct": {
+      "title": "User Conduct and Prohibited Uses",
+      "intro": "You agree not to use the service to:",
+      "prohibitions": [
+        "Upload false, misleading, or fraudulent information",
+        "Violate any applicable laws or regulations",
+        "Harass, abuse, or harm other users",
+        "Spam or send unsolicited communications",
+        "Attempt to gain unauthorized access to our systems",
+        "Use automated systems to access the service without permission"
+      ]
+    },
+    "aiServices": {
+      "title": "AI-Powered Services",
+      "intro": "Our AI services, including resume optimization and mock interviews, are provided \"as is.\" While we strive for accuracy:",
+      "disclaimers": [
+        "AI suggestions are recommendations, not guarantees of employment success",
+        "Users should review and verify all AI-generated content",
+        "We continuously improve our AI models but cannot guarantee perfection",
+        "Users retain ownership of their uploaded content and data"
+      ]
+    },
+    "privacy": {
+      "title": "Privacy and Data Protection",
+      "content": "Your privacy is important to us. Please review our {privacyLink} to understand how we collect, use, and protect your information.",
+      "privacyLinkText": "Privacy Policy"
+    },
+    "termination": {
+      "title": "Termination",
+      "content": "We may terminate or suspend your account and access to the service immediately, without prior notice, for conduct that we believe violates these Terms of Service or is harmful to other users, us, or third parties."
+    },
+    "disclaimers": {
+      "title": "Disclaimers and Limitation of Liability",
+      "intro": "The service is provided \"as is\" without warranties of any kind. We do not guarantee:",
+      "noGuarantees": [
+        "Employment opportunities or job placement success",
+        "Continuous, uninterrupted service availability",
+        "Error-free operation of our platform",
+        "Specific outcomes from using our AI services"
+      ]
+    },
+    "changes": {
+      "title": "Changes to Terms",
+      "content": "We reserve the right to modify these terms at any time. We will notify users of significant changes via email or through our platform. Continued use of the service after changes constitutes acceptance of the new terms."
+    },
+    "contact": {
+      "title": "Contact Information",
+      "intro": "If you have any questions about these Terms of Service, please contact us at:",
+      "email": "Email:",
+      "phone": "Phone:",
+      "address": "Address:"
+    }
+  },
+  "footer": {
+    "copyright": "© {year} Huntier Inc. All rights reserved."
+  }
+}

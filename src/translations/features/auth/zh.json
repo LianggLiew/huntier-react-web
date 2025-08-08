@@ -1,6 +1,6 @@
 {
-  "verificationRequired": "需要验证",
-  "passwordlessLogin": "免密登录",
+  "verificationRequired": "免密验证",
+  "passwordlessLogin": "欢迎加入Huntier",
   "verifyIdentity": "验证您的身份以访问您的账户",
   "findJob": "我想找工作",
   "wantToHire": "我想招聘",
@@ -24,8 +24,8 @@
   "termsOfService": "服务条款",
   "and": "和",
   "privacyPolicy": "隐私政策",
-  "customerService": "客服热线：400-065-5799 | 工作时间：8:00-22:00",
-  "licenseInfo": "人力资源服务许可证 | 营业执照 | 朝阳区社会局监管",
+  "customerService": "客服热线： +86-13857863960",
+  "licenseInfo": "客服邮箱: general@gohuntier.com",
   "errors": {
     "enterEmail": "请输入您的邮箱地址",
     "enterPhone": "请输入您的手机号码",

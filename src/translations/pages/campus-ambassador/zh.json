@@ -1,0 +1,96 @@
+{
+  "title": "成为校园大使",
+  "subtitle": "加入瀚拓校园大使计划，在您的大学中创造影响力",
+  "description": "帮助我们革命性地改变学生寻找职业机会的方式，同时发展您的领导技能并建立您的专业网络。",
+  "form": {
+    "personalInfo": {
+      "title": "个人信息",
+      "firstName": "名字",
+      "lastName": "姓氏",
+      "email": "电子邮箱",
+      "phone": "手机号码",
+      "firstNamePlaceholder": "请输入您的名字",
+      "lastNamePlaceholder": "请输入您的姓氏",
+      "emailPlaceholder": "your.email@university.edu",
+      "phonePlaceholder": "+86 138 0013 8000"
+    },
+    "academic": {
+      "title": "学术信息",
+      "university": "大学",
+      "major": "专业/学习领域",
+      "graduationYear": "预期毕业年份",
+      "currentYear": "当前学年",
+      "universityPlaceholder": "请输入您的大学名称",
+      "majorPlaceholder": "计算机科学、商务、等等",
+      "yearOptions": {
+        "freshman": "大一",
+        "sophomore": "大二",
+        "junior": "大三",
+        "senior": "大四",
+        "graduate": "研究生"
+      }
+    },
+    "experience": {
+      "title": "经验与技能",
+      "leadership": "领导经验",
+      "socialMedia": "社交媒体影响力",
+      "skills": "相关技能",
+      "leadershipPlaceholder": "描述任何领导职位、社团职务、志愿工作...",
+      "socialMediaPlaceholder": "微博、抖音、B站粉丝数量或参与度...",
+      "skillsPlaceholder": "营销、沟通、活动策划、公共演讲..."
+    },
+    "motivation": {
+      "title": "动机与目标",
+      "why": "为什么要成为校园大使？",
+      "contribute": "您将如何在校园中推广瀚拓？",
+      "goals": "您希望通过此计划实现什么目标？",
+      "whyPlaceholder": "分享您加入我们大使计划的动机...",
+      "contributePlaceholder": "描述您对校园推广、活动、社交媒体的想法...",
+      "goalsPlaceholder": "您想发展什么技能？您想产生什么影响？"
+    },
+    "availability": {
+      "title": "时间安排与承诺",
+      "timeCommitment": "每周可投入多少小时？",
+      "duration": "可以承诺参与多长时间？",
+      "startDate": "何时可以开始？",
+      "timeOptions": {
+        "2-5": "每周2-5小时",
+        "5-10": "每周5-10小时",
+        "10+": "每周10+小时"
+      },
+      "durationOptions": {
+        "semester": "一个学期",
+        "year": "一个学年",
+        "flexible": "灵活/持续进行"
+      }
+    },
+    "submitButton": "提交申请",
+    "submitting": "提交中...",
+    "errors": {
+      "required": "此字段为必填项",
+      "email": "请输入有效的电子邮箱地址",
+      "phone": "请输入有效的手机号码"
+    }
+  },
+  "benefits": {
+    "title": "计划福利",
+    "items": [
+      "抢先体验新功能和测试版",
+      "独家网络活动和导师机会",
+      "领导力发展和专业技能培训",
+      "真实营销经验的作品集建设",
+      "成功完成后获得推荐信",
+      "瀚拓实习和工作机会"
+    ]
+  },
+  "requirements": {
+    "title": "要求",
+    "items": [
+      "目前为全日制在读学生",
+      "强大的沟通和社交媒体技能",
+      "对职业发展和帮助同龄人充满热情",
+      "承诺参与计划持续时间和活动",
+      "保持良好的学术表现"
+    ]
+  }
+}

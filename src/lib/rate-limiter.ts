@@ -17,9 +17,9 @@ export interface RateLimitConfig {
 }
 
 export const DEFAULT_RATE_LIMIT_CONFIG: RateLimitConfig = {
-  maxSendPerMinute: 2,
-  maxSendPerHour: 5,
-  maxSendPerDay: 20,
+  maxSendPerMinute: 20,
+  maxSendPerHour: 50,
+  maxSendPerDay: 200,
   maxVerifyPerMinute: 5,
   maxVerifyPerOtp: 3,
   minResendInterval: 60, // 1 minute

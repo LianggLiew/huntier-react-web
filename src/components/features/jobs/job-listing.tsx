@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { JobPagination } from "@/components/ui/pagination"
-import { Loader2, SlidersHorizontal, X, Search } from "lucide-react"
+import { Loader2, SlidersHorizontal, X, Search, Menu } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useHeaderVisibility } from "@/hooks/useHeaderVisibility"
 
@@ -33,6 +33,8 @@ interface JobListingProps {
   showFilters?: boolean
   setShowFilters?: (show: boolean) => void
   getStickyContainerClasses?: (baseClasses: string, fixedClasses: string) => string
+  isMobileMenuOpen?: boolean
+  onToggleMobileMenu?: () => void
 }
 
 // API function to fetch jobs
@@ -98,7 +100,9 @@ export function JobListing({
   setSortBy: setExternalSortBy,
   showFilters: externalShowFilters,
   setShowFilters: setExternalShowFilters,
-  getStickyContainerClasses
+  getStickyContainerClasses,
+  isMobileMenuOpen,
+  onToggleMobileMenu
 }: JobListingProps) {
   const [jobsData, setJobsData] = useState<JobListingResponse | null>(null)
   const [loading, setLoading] = useState(true)
@@ -236,16 +240,19 @@ export function JobListing({
   // Header only component for sticky header
   if (headerOnly) {
     return (
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-col gap-3">
+        {/* Desktop layout - all in one row */}
+        <div className="hidden sm:flex items-center gap-3">
+          {/* Filter button */}
           <Button
             variant="outline"
             size="sm"
             onClick={toggleFilters}
-            className="relative"
+            className="relative h-9 sm:h-10 px-2 sm:px-4 shrink-0"
           >
-            <SlidersHorizontal className="w-4 h-4 mr-2" />
-            Filters
+            <SlidersHorizontal className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+            <span className="hidden sm:inline text-sm">Filters</span>
+            <span className="sm:hidden text-xs">Filter</span>
             {activeFilterCount > 0 && (
               <Badge 
                 variant="destructive" 
@@ -255,50 +262,129 @@ export function JobListing({
               </Badge>
             )}
           </Button>
+
           {activeFilterCount > 0 && (
             <Button
               variant="ghost"
               size="sm"
               onClick={clearFilters}
-              className="text-gray-500 hover:text-gray-700"
+              className="text-gray-500 hover:text-gray-700 h-9 sm:h-10 px-2 sm:px-4 shrink-0"
             >
-              <X className="w-4 h-4 mr-1" />
-              Clear filters
+              <X className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+              <span className="hidden sm:inline text-sm">Clear filters</span>
+              <span className="sm:hidden text-xs">Clear</span>
             </Button>
           )}
-          <p className="text-gray-600 dark:text-gray-400 hidden sm:block">
+
+          {/* Job count - hidden on small screens */}
+          <p className="text-gray-600 dark:text-gray-400 text-sm shrink-0 hidden md:block">
             {totalJobs} jobs found
           </p>
-        </div>
-        
-        <div className="flex items-center gap-3">
-          <div className="relative flex-1 sm:flex-none">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+
+          {/* Search bar - flexible width */}
+          <div className="relative flex-1">
+            <Search className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
             <Input
               placeholder="Search jobs..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 w-full sm:w-64"
+              className="pl-8 sm:pl-10 h-9 sm:h-10 text-sm"
             />
           </div>
+          
+          {/* Sort dropdown */}
           <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-32 sm:w-48">
-              <SelectValue placeholder="Sort by..." />
+            <SelectTrigger className="w-20 sm:w-32 lg:w-48 h-9 sm:h-10 shrink-0 text-xs sm:text-sm">
+              <SelectValue placeholder="Sort" />
             </SelectTrigger>
             <SelectContent>
               {sortOptions.map(option => (
                 <SelectItem key={option.value} value={option.value}>
-                  {option.label}
+                  <span className="hidden sm:inline">{option.label}</span>
+                  <span className="sm:hidden">
+                    {option.label.split(':')[0].split(' ')[0]}
+                  </span>
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
-        
-        {/* Mobile job count */}
-        <p className="text-gray-600 dark:text-gray-400 text-sm sm:hidden">
-          {totalJobs} jobs found
-        </p>
+
+        {/* Mobile layout */}
+        <div className="sm:hidden flex flex-col gap-3">
+          {/* Top row: Hamburger button and search bar */}
+          <div className="flex items-center gap-3">
+            {/* Hamburger button */}
+            {onToggleMobileMenu && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-10 w-10 p-0 shrink-0"
+                onClick={onToggleMobileMenu}
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+            )}
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Search jobs..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 h-10 text-sm"
+              />
+            </div>
+          </div>
+          
+          {/* Bottom row: Filter and Sort buttons */}
+          <div className="flex items-center gap-3">
+            {/* Filter button */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={toggleFilters}
+              className="relative h-10 px-4 flex-1"
+            >
+              <SlidersHorizontal className="w-4 h-4 mr-2" />
+              <span className="text-sm">Filters</span>
+              {activeFilterCount > 0 && (
+                <Badge 
+                  variant="destructive" 
+                  className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
+                >
+                  {activeFilterCount}
+                </Badge>
+              )}
+            </Button>
+
+            {/* Sort dropdown */}
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-32 h-10 flex-1 text-sm">
+                <SelectValue placeholder="Sort" />
+              </SelectTrigger>
+              <SelectContent>
+                {sortOptions.map(option => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Clear filters button for mobile */}
+          {activeFilterCount > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={clearFilters}
+              className="text-gray-500 hover:text-gray-700 h-8 px-4 self-center"
+            >
+              <X className="w-4 h-4 mr-1" />
+              <span className="text-sm">Clear filters</span>
+            </Button>
+          )}
+        </div>
       </div>
     )
   }
@@ -307,10 +393,10 @@ export function JobListing({
   if (contentOnly) {
     return (
       <div className="flex relative ">
-        {/* Collapsible Filters Sidebar - Sticky positioned */}
+        {/* Desktop Filters Sidebar - Hidden on mobile */}
         <div 
           className={cn(
-            "transition-all duration-300 ease-in-out overflow-hidden shrink-0",
+            "hidden lg:block transition-all duration-300 ease-in-out overflow-hidden shrink-0",
             showFilters 
               ? "w-80 opacity-100 mr-8" 
               : "w-0 opacity-0 mr-0"
@@ -334,20 +420,21 @@ export function JobListing({
 
         {/* Mobile Filters Overlay */}
         {showFilters && (
-          <div className="lg:hidden fixed inset-0 z-40 bg-black/50" onClick={toggleFilters}>
+          <div className="lg:hidden fixed inset-0 z-50 bg-black/50" onClick={toggleFilters}>
             <div 
-              className="absolute left-0 top-0 h-full w-80 bg-white dark:bg-gray-950 shadow-xl overflow-y-auto"
+              className="absolute left-0 top-20 h-full w-full max-w-sm bg-white dark:bg-gray-950 shadow-xl overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-semibold">Filters</h2>
+              <div className="p-4 lg:p-6">
+                <div className="flex items-center justify-between mb-4 lg:mb-8">
+                  <h2 className="text-lg lg:text-2xl font-bold">Filter Jobs</h2>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={toggleFilters}
+                    className="h-10 w-10 lg:h-12 lg:w-12 p-0 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-5 h-5 lg:w-6 lg:h-6" />
                   </Button>
                 </div>
                 <JobFiltersPanel 
@@ -355,7 +442,6 @@ export function JobListing({
                   onFiltersChange={setFilters}
                   onClearFilters={clearFilters}
                   onClose={() => setShowFilters(false)}
-                  isMobile={true}
                 />
               </div>
             </div>
@@ -378,7 +464,7 @@ export function JobListing({
           )}
           
           {/* Job Cards */}
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {error ? (
               <Card>
                 <CardContent className="py-12 text-center">

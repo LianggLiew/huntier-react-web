@@ -54,7 +54,7 @@ export function ProfileTab({
         dateOfBirth={profile?.dateOfBirth}
         education={profile?.highestDegree}
         major={profile?.major}
-        profileImage={profile?.avatarUrl || profileImage}
+        profileImage={profile?.avatarUrl || (profile?.avatarUrl === null ? '' : profileImage)}
         profileCompletion={currentUserData.profileCompletion}
         completionItems={currentUserData.completionItems}
         jobPreferences={currentUserData.jobPreferences}

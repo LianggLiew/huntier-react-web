@@ -9,7 +9,7 @@ const SESSION_EXPIRY = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
 const REFRESH_TOKEN_EXPIRY = 30 * 24 * 60 * 60 * 1000 // 30 days in milliseconds
 
 // Simple JWT-like token structure without external dependencies
-interface TokenPayload {
+export interface TokenPayload {
   userId: string
   email?: string | null
   phone?: string | null
@@ -21,7 +21,7 @@ interface TokenPayload {
 /**
  * Create a simple signed token using HMAC
  */
-function createToken(payload: TokenPayload): string {
+export function createToken(payload: TokenPayload): string {
   const secret = process.env.JWT_SECRET || 'your-super-secret-key-change-this-in-production'
   const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url')
   const body = Buffer.from(JSON.stringify(payload)).toString('base64url')
@@ -94,7 +94,7 @@ export async function createUserSession(contactValue: string, contactType: 'emai
     let isNewUser = false
 
     if (!userData) {
-      // Create new user
+      // Create new user (this shouldn't happen now since createOtp creates users)
       const { data: newUser, error: createError } = await supabaseAdmin
         .from('users')
         .insert([{
@@ -110,6 +110,9 @@ export async function createUserSession(contactValue: string, contactType: 'emai
       userData = newUser
       isNewUser = true
     } else {
+      // Check if user was just created during OTP process (never verified before)
+      const wasJustCreated = !userData.is_verified && userData.last_login === null
+      
       // Update existing user
       const { data: updatedUser, error: updateError } = await supabaseAdmin
         .from('users')
@@ -123,6 +126,9 @@ export async function createUserSession(contactValue: string, contactType: 'emai
 
       if (updateError) throw updateError
       userData = updatedUser
+      
+      // Treat users created during OTP process as new users
+      isNewUser = wasJustCreated
     }
 
     // Format user data according to interface contract
@@ -136,6 +142,7 @@ export async function createUserSession(contactValue: string, contactType: 'emai
       createdAt: userData.created_at,
       lastLogin: userData.last_login
     }
+
 
     // Create session token
     const tokenPayload: TokenPayload = {
@@ -436,4 +443,93 @@ export function clearSessionCookies(response: NextResponse): void {
 export function hasPermission(user: User, permission: string): boolean {
   // Placeholder for future role-based permissions
   return user.isVerified && user.isAuthenticated
+}
+
+/**
+ * Check if a JWT token is expiring soon
+ */
+export function isTokenExpiring(token: string, thresholdMinutes: number = 5): boolean {
+  try {
+    const payload = verifyToken(token)
+    if (!payload) return true // If invalid, consider it "expiring"
+    
+    const thresholdMs = thresholdMinutes * 60 * 1000
+    const expirationBuffer = payload.exp - thresholdMs
+    
+    return Date.now() >= expirationBuffer
+  } catch {
+    return true // If error, consider it expiring
+  }
+}
+
+/**
+ * Refresh tokens using the refresh token
+ */
+export async function refreshTokens(refreshToken: string): Promise<{
+  success: boolean
+  sessionToken?: string
+  refreshToken?: string
+  user?: User
+  error?: string
+}> {
+  try {
+    // Make API call to refresh endpoint
+    const baseUrl = process.env.NEXTAUTH_URL || process.env.VERCEL_URL || 'http://localhost:3000'
+    const response = await fetch(`${baseUrl}/api/auth/refresh`, {
+      method: 'POST',
+      headers: {
+        'Cookie': `refresh-token=${refreshToken}`
+      }
+    })
+
+    const result = await response.json()
+    
+    if (!response.ok || !result.success) {
+      return {
+        success: false,
+        error: result.error || 'Token refresh failed'
+      }
+    }
+
+    // Extract new tokens from response headers if available
+    // Note: In a real implementation, you'd extract from Set-Cookie headers
+    // For now, we'll return success and let the calling code handle cookie updates
+    return {
+      success: true,
+      user: result.data?.user
+    }
+
+  } catch (error) {
+    console.error('Token refresh error:', error)
+    return {
+      success: false,
+      error: 'Network error during token refresh'
+    }
+  }
+}
+
+/**
+ * Clean up expired refresh tokens from database
+ */
+export async function cleanupExpiredTokens(): Promise<{ success: boolean; deletedCount?: number }> {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('refresh_tokens')
+      .delete()
+      .lt('expires_at', new Date().toISOString())
+      .select('id')
+
+    if (error) {
+      console.error('Failed to cleanup expired tokens:', error)
+      return { success: false }
+    }
+
+    return {
+      success: true,
+      deletedCount: data?.length || 0
+    }
+  } catch (error) {
+    console.error('Error during token cleanup:', error)
+    return { success: false }
+  }
 }

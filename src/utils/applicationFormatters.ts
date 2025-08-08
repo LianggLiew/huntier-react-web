@@ -32,9 +32,8 @@ export interface RawApplicationData {
   
   // Job data (optional, when joined with jobs table)
   jobs?: {
-    // Different routes use different field names for job ID
-    id?: number           // Used in applications/[id]/route.ts
-    job_id?: number       // Used in applications/route.ts and applications/status/[jobId]/route.ts
+    // Both routes now use job_id consistently
+    job_id: number
     title: string
     location: string
     employment_type: string
@@ -72,8 +71,8 @@ export function formatJobApplication(data: RawApplicationData): JobApplication {
     
     // Job data (optional, when available)
     job: data.jobs ? {
-      // Handle different job ID field variations across routes
-      jobId: data.jobs.job_id || data.jobs.id || data.job_id,
+      // Both query formats now use job_id consistently
+      jobId: data.jobs.job_id,
       title: data.jobs.title,
       location: data.jobs.location,
       employmentType: data.jobs.employment_type,
@@ -126,7 +125,7 @@ export const APPLICATION_SELECT_FIELDS = `
 `
 
 /**
- * Alternative SELECT query for routes that use jobs.id instead of jobs.job_id
+ * Alternative SELECT query for routes that use jobs.job_id instead of jobs.id
  * Used in applications/[id]/route.ts
  */
 export const APPLICATION_SELECT_FIELDS_ALT = `
@@ -144,7 +143,7 @@ export const APPLICATION_SELECT_FIELDS_ALT = `
   nationality,
   applicant_wechat_id,
   jobs!job_id (
-    id,
+    job_id,
     title,
     location,
     employment_type,

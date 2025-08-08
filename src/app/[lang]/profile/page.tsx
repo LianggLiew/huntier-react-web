@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PersonalInfoModal } from '@/components/features/profile/PersonalInfoModal';
 import { ProfileTab } from '@/components/features/profile/ProfileTab';
-import { ApplicationsTab } from '@/components/features/profile/ApplicationsTab';
+import { ApplicationsTabReal } from '@/components/features/profile/ApplicationsTabReal';
 import { SavedJobsTab } from '@/components/features/profile/SavedJobsTab';
 import { NavigationSidebar } from '@/components/ui/navigation-sidebar';
 import { ToastProvider, useToast } from '@/components/ui/toast-provider';
@@ -18,7 +18,6 @@ import { useProfileAPI } from '@/hooks/useProfileAPI';
 import { getFullName, transformProfileForUI } from '@/utils/profileUtils';
 import { emptyStateTemplates } from '@/utils/profileConfig';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
-
 
 function ProfilePageContent({ params }: { params: Promise<{ lang: string }> | { lang: string } }) {
   const { user, profile, loading: authLoading, refreshUser } = useAuth();
@@ -33,6 +32,15 @@ function ProfilePageContent({ params }: { params: Promise<{ lang: string }> | { 
   const [profileImage, setProfileImage] = useLocalStorage('userProfileImage', '');
   const { showToast } = useToast();
   const { saveProfile, isLoading: apiLoading } = useProfileAPI();
+
+  // Clear localStorage profile image if user doesn't have an avatar URL
+  // This prevents showing previous user's cached image to new users
+  useEffect(() => {
+    if (user && !profile?.avatarUrl && profileImage) {
+      // Clear the cached profile image for new users or users without avatars
+      setProfileImage('');
+    }
+  }, [user?.id, profile?.avatarUrl, profileImage, setProfileImage]);
   
   // Resume upload hook
   const { triggerFileSelect, handleFileSelect, isUploading, fileInputRef } = useResumeUpload({
@@ -127,8 +135,8 @@ function ProfilePageContent({ params }: { params: Promise<{ lang: string }> | { 
     if (!profile?.resumeFileUrl) {
       showToast({
         type: 'info',
-        title: 'No Resume Found',
-        description: 'You haven\'t uploaded a resume yet. Please upload one first.'
+        title: dictionary?.profile?.toast?.noResumeFound || 'No Resume Found',
+        description: dictionary?.profile?.toast?.noResumeFoundDescription || 'You haven\'t uploaded a resume yet. Please upload one first.'
       });
       return;
     }
@@ -154,14 +162,14 @@ function ProfilePageContent({ params }: { params: Promise<{ lang: string }> | { 
 
         showToast({
           type: 'success',
-          title: 'CV Downloaded',
-          description: `${result.data.fileName} has been downloaded successfully.`
+          title: dictionary?.profile?.toast?.resumeDownloaded || 'CV Downloaded',
+          description: `${result.data.fileName} ${dictionary?.profile?.toast?.resumeDownloadedDescription || 'has been downloaded successfully.'}`
         });
       } else if (response.status === 404) {
         showToast({
           type: 'info',
-          title: 'No Resume Found',
-          description: 'You haven\'t uploaded a resume yet. Please upload one first.'
+          title: dictionary?.profile?.toast?.noResumeFound || 'No Resume Found',
+          description: dictionary?.profile?.toast?.noResumeFoundDescription || 'You haven\'t uploaded a resume yet. Please upload one first.'
         });
       } else {
         throw new Error(result.error || 'Failed to download resume');
@@ -170,8 +178,8 @@ function ProfilePageContent({ params }: { params: Promise<{ lang: string }> | { 
       console.error('Failed to download CV:', error);
       showToast({
         type: 'error',
-        title: 'Download Failed',
-        description: 'Unable to download your resume. Please try again later.'
+        title: dictionary?.profile?.toast?.downloadFailed || 'Download Failed',
+        description: dictionary?.profile?.toast?.downloadFailedDescription || 'Unable to download your resume. Please try again later.'
       });
     } finally {
       setProfileLoading(false);
@@ -181,7 +189,7 @@ function ProfilePageContent({ params }: { params: Promise<{ lang: string }> | { 
   if (!isHydrated || authLoading || dictionaryLoading) {
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <div className="text-white">Loading profile...</div>
+        <div className="text-white">{dictionary?.profile?.loading?.profile || 'Loading profile...'}</div>
       </div>
     );
   }
@@ -190,7 +198,7 @@ function ProfilePageContent({ params }: { params: Promise<{ lang: string }> | { 
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <div className="text-white">Please log in to view your profile.</div>
+        <div className="text-white">{dictionary?.profile?.loading?.pleaseLogin || 'Please log in to view your profile.'}</div>
       </div>
     );
   }
@@ -223,11 +231,12 @@ function ProfilePageContent({ params }: { params: Promise<{ lang: string }> | { 
           </TabsContent>
 
           <TabsContent value="applications" className="space-y-6">
-            <ApplicationsTab
+            <ApplicationsTabReal
               currentUserData={currentUserData}
               profile={profile}
               profileImage={profileImage}
               dictionary={dictionary}
+              params={{ lang }}
               onPersonalInfoEdit={() => setIsPersonalInfoModalOpen(true)}
               onProfileImageSave={handleProfileImageSave}
               onDownloadCV={handleDownloadCV}
@@ -241,6 +250,7 @@ function ProfilePageContent({ params }: { params: Promise<{ lang: string }> | { 
               profile={profile}
               profileImage={profileImage}
               dictionary={dictionary}
+              lang={lang}
               onPersonalInfoEdit={() => setIsPersonalInfoModalOpen(true)}
               onProfileImageSave={handleProfileImageSave}
               onDownloadCV={handleDownloadCV}

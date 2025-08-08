@@ -25,6 +25,8 @@ interface JobPreferences {
 interface ProfileSidebarProps {
   // User data
   name: string;
+  title?: string;
+  location?: string;
   profileImage: string;
   firstName?: string;
   lastName?: string;
@@ -56,17 +58,11 @@ interface ProfileSidebarProps {
 export function ProfileSidebar({
   name,
   profileImage,
-  firstName,
-  lastName,
-  dateOfBirth,
   nationality,
-  phone,
-  email,
   education,
   major,
   profileCompletion,
   completionItems,
-  jobPreferences,
   onEditClick,
   onProfileImageSave,
   onDownloadCV,
@@ -91,19 +87,19 @@ export function ProfileSidebar({
             <div className="w-full mb-3 text-left">
               {nationality && (
                 <div className="mb-1">
-                  <span className="text-xs text-gray-400">Nationality:</span>
+                  <span className="text-xs text-gray-400">{dictionary?.profile?.sidebar?.nationality || 'Nationality:'}</span>
                   <span className="text-sm text-gray-300 ml-2">{nationality}</span>
                 </div>
               )}
               {education && (
                 <div className="mb-1">
-                  <span className="text-xs text-gray-400">Education:</span>
+                  <span className="text-xs text-gray-400">{dictionary?.profile?.sidebar?.education || 'Education:'}</span>
                   <span className="text-sm text-gray-300 ml-2">{education}</span>
                 </div>
               )}
               {major && (
                 <div className="mb-1">
-                  <span className="text-xs text-gray-400">Major:</span>
+                  <span className="text-xs text-gray-400">{dictionary?.profile?.sidebar?.major || 'Major:'}</span>
                   <span className="text-sm text-gray-300 ml-2">{major}</span>
                 </div>
               )}

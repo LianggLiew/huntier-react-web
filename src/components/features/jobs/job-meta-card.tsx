@@ -2,7 +2,9 @@ import { Clock, MapPin, DollarSign, Building2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { SmartLogo, useSmartLogo } from "@/components/ui/smart-logo"
 import { getRelativeTime } from "@/lib/utils"
+import { ApplicationButton } from "./ApplicationButton"
 
 interface JobMetaCardProps {
   jobTitle: string
@@ -13,6 +15,10 @@ interface JobMetaCardProps {
   location: string
   employmentType?: 'full-time' | 'part-time' | 'contract'
   postedDate: Date
+  jobId: string
+  lang: string
+  onApplicationClick?: () => void
+  refreshTrigger?: number
 }
 
 export function JobMetaCard({ 
@@ -23,8 +29,14 @@ export function JobMetaCard({
   salaryMax,
   location,
   employmentType,
-  postedDate
+  postedDate,
+  jobId,
+  lang,
+  onApplicationClick,
+  refreshTrigger
 }: JobMetaCardProps) {
+  const { logoUrl, fallbackText, alt, preferDarkBackground } = useSmartLogo(companyLogo, companyName)
+  
   const formatSalary = (salaryMin?: number, salaryMax?: number) => {
     if (!salaryMin && !salaryMax) return 'Salary not specified'
     if (salaryMin && salaryMax) {
@@ -56,11 +68,15 @@ export function JobMetaCard({
         {/* Job Title with Company Logo */}
         <div className="flex items-center gap-3 mb-1">
           {/* Company Logo */}
-          <div className="w-12 h-12 bg-gradient-to-br from-emerald-50 to-teal-100 dark:from-emerald-900/70 dark:to-teal-900/30 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
-            <span className="text-emerald-600 dark:text-emerald-300 text-sm font-semibold">
-              {companyName.substring(0, 2).toUpperCase()}
-            </span>
-          </div>
+          <SmartLogo
+            src={logoUrl}
+            alt={alt}
+            fallbackText={fallbackText}
+            preferDarkBackground={preferDarkBackground}
+            className="w-12 h-12 rounded-lg"
+            imageClassName="w-full h-full"
+            containerClassName="text-sm"
+          />
           {/* Job Title */}
           <h3 className="font-bold text-lg text-gray-900 dark:text-white">
             {jobTitle}
@@ -106,9 +122,15 @@ export function JobMetaCard({
 
         {/* Apply Job Button */}
         <div className="pt-4">
-          <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">
-            Apply Now
-          </Button>
+          <ApplicationButton 
+            jobId={parseInt(jobId)}
+            lang={lang}
+            variant="button"
+            size="md"
+            className="w-full"
+            onApplicationClick={onApplicationClick}
+            refreshTrigger={refreshTrigger}
+          />
         </div>
       </CardContent>
     </Card>

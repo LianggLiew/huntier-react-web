@@ -32,7 +32,7 @@ function OnboardingPageContent({ params }: LocalizedPageProps) {
   
   const { user, updateProfile, updateUser } = useAuth()
   const { toast } = useToast()
-  const { goToJobs, isReady } = useNavigation(params)
+  const { goToJobs, push, isReady } = useNavigation(params)
 
   // Initialize language and load page-specific translations
   React.useEffect(() => {
@@ -227,7 +227,32 @@ function OnboardingPageContent({ params }: LocalizedPageProps) {
         description: "Your profile is ready. Let's find you some great opportunities!"
       })
 
-      // Navigate to jobs page
+      // Check for stored redirect from before auth flow
+      if (typeof window !== 'undefined') {
+        const storedRedirect = localStorage.getItem('huntier_redirect_after_auth');
+        if (storedRedirect) {
+          // Clean up the stored redirect
+          localStorage.removeItem('huntier_redirect_after_auth');
+          // Use stored redirect, removing language prefix if present
+          // Handle URLs like "/en/jobs/123" -> "jobs/123"
+          const cleanStoredRedirect = storedRedirect.replace(/^\/[a-z]{2}\//, '') || 'jobs';
+          const cleanDestination = cleanStoredRedirect.startsWith('/') ? cleanStoredRedirect.slice(1) : cleanStoredRedirect;
+          push(cleanDestination);
+          return;
+        }
+
+        // Check if user came from profile button (Flow 1)
+        const profileFlow = localStorage.getItem('huntier_profile_flow');
+        if (profileFlow === 'true') {
+          // Clean up the profile flow flag
+          localStorage.removeItem('huntier_profile_flow');
+          // Redirect to profile page
+          push('profile');
+          return;
+        }
+      }
+
+      // Navigate to jobs page by default (Flow 2 without stored redirect)
       if (isReady) {
         goToJobs()
       }

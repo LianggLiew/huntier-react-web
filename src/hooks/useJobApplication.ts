@@ -157,13 +157,18 @@ export const useJobApplication = (options: UseJobApplicationOptions = {}): UseJo
         return null
       }
 
-      const result: ApiResponse<{ status: ApplicationStatus }> = await response.json()
+      const result: ApiResponse<{ hasApplied: boolean, application: JobApplication | null }> = await response.json()
 
       if (!response.ok || !result.success) {
         throw new Error(result.error || 'Failed to check application status')
       }
 
-      return result.data?.status || null
+      // If user hasn't applied, return null
+      if (!result.data?.hasApplied || !result.data.application) {
+        return null
+      }
+
+      return result.data.application.status || null
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to check application status'

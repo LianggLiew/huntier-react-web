@@ -5,7 +5,10 @@ import Link from "next/link"
 import { Building2, MapPin, Star } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
+import { SmartLogo, useSmartLogo } from "@/components/ui/smart-logo"
 import { cn } from "@/lib/utils"
+import { ApplicationButton } from "./ApplicationButton"
+import { JobBookmarkButton } from "./JobBookmarkButton"
 
 interface EnhancedJobCardProps {
   id: string
@@ -19,6 +22,7 @@ interface EnhancedJobCardProps {
   isFeatured?: boolean
   isSaved?: boolean
   lang: string
+  jobId?: number
 }
 
 export function EnhancedJobCard({
@@ -32,10 +36,12 @@ export function EnhancedJobCard({
   matchPercentage,
   isFeatured = false,
   isSaved = false,
-  lang
+  lang,
+  jobId
 }: EnhancedJobCardProps) {
   const [isHovered, setIsHovered] = useState(false)
   const [saved, setSaved] = useState(isSaved)
+  const { logoUrl, fallbackText, alt, preferDarkBackground } = useSmartLogo(null, company)
   
   return (
     <Link href={`/${lang}/job/${id}`} passHref>
@@ -61,17 +67,48 @@ export function EnhancedJobCard({
           )}
         />
         
-        <CardContent className="p-5 relative z-20">
+        <CardContent className="p-4 sm:p-5 relative z-20">
+          {/* Application Status Badge & Bookmark - Top Right */}
+          <div className="absolute right-3 sm:right-4 top-3 sm:top-4 flex items-center gap-1 sm:gap-2">
+            {jobId && (
+              <>
+                <JobBookmarkButton 
+                  jobId={jobId}
+                  isSaved={isSaved}
+                  variant="ghost"
+                  size="sm"
+                />
+                <ApplicationButton 
+                  jobId={jobId} 
+                  lang={lang} 
+                  variant="badge"
+                  size="sm"
+                />
+              </>
+            )}
+          </div>
+          
           <div className="flex flex-col gap-2">
-            <div className="flex items-start justify-between">
-              <h3 className="font-semibold text-lg">
-                {title}
-                <span className="block max-w-0 group-hover:max-w-full h-0.5 bg-emerald-500/60 transition-all duration-500"></span>
-              </h3>
+            <div className="flex items-start justify-between pr-12 sm:pr-16">
+              <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                {/* Company Logo */}
+                <SmartLogo
+                  src={logoUrl}
+                  alt={alt}
+                  fallbackText={fallbackText}
+                  preferDarkBackground={preferDarkBackground}
+                  className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex-shrink-0"
+                  containerClassName="text-xs sm:text-sm"
+                />
+                <h3 className="font-semibold text-base sm:text-lg truncate">
+                  {title}
+                  <span className="block max-w-0 group-hover:max-w-full h-0.5 bg-emerald-500/60 transition-all duration-500"></span>
+                </h3>
+              </div>
               
               {matchPercentage && (
                 <Badge className={cn(
-                  "bg-emerald-50 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 transition-all",
+                  "bg-emerald-50 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 transition-all text-xs sm:text-sm shrink-0",
                   isHovered ? "scale-110" : ""
                 )}>
                   {matchPercentage}% match
@@ -79,21 +116,21 @@ export function EnhancedJobCard({
               )}
             </div>
             
-            <div className="flex flex-wrap gap-1.5 text-sm text-muted-foreground">
+            <div className="flex flex-wrap gap-1 sm:gap-1.5 text-xs sm:text-sm text-muted-foreground">
               <div className="flex items-center gap-1">
-                <Building2 className="w-3.5 h-3.5" />
-                <span>{company}</span>
+                <Building2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                <span className="truncate">{company}</span>
               </div>
               <span className="px-1">•</span>
               <div className="flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5" />
-                <span>{location}</span>
+                <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                <span className="truncate">{location}</span>
               </div>
             </div>
             
-            <div className="flex justify-between items-center mt-1">
-              <span className="font-medium text-emerald-700 dark:text-emerald-400">{salary}</span>
-              <span className="text-sm text-muted-foreground">{postDate}</span>
+            <div className="flex justify-between items-center mt-1 gap-2">
+              <span className="font-medium text-emerald-700 dark:text-emerald-400 text-sm sm:text-base truncate">{salary}</span>
+              <span className="text-xs sm:text-sm text-muted-foreground shrink-0">{postDate}</span>
             </div>
             
             {tags.length > 0 && (
@@ -107,23 +144,25 @@ export function EnhancedJobCard({
             )}
           </div>
           
-          <button 
-            className={cn(
-              "absolute top-4 right-4 p-1.5 rounded-full transition-all",
-              saved ? "text-amber-500" : "text-gray-300 dark:text-gray-600",
-              isHovered && !saved && "text-gray-400 dark:text-gray-500"
-            )}
-            onClick={(e) => {
-              e.preventDefault();
-              setSaved(!saved);
-            }}
-          >
-            <Star className={cn(
-              "w-5 h-5 transition-transform",
-              saved && "fill-current",
-              isHovered && "scale-110"
-            )} />
-          </button>
+          {!jobId && (
+            <button 
+              className={cn(
+                "absolute top-4 right-4 p-1.5 rounded-full transition-all",
+                saved ? "text-amber-500" : "text-gray-300 dark:text-gray-600",
+                isHovered && !saved && "text-gray-400 dark:text-gray-500"
+              )}
+              onClick={(e) => {
+                e.preventDefault();
+                setSaved(!saved);
+              }}
+            >
+              <Star className={cn(
+                "w-5 h-5 transition-transform",
+                saved && "fill-current",
+                isHovered && "scale-110"
+              )} />
+            </button>
+          )}
         </CardContent>
       </Card>
     </Link>

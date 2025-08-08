@@ -69,7 +69,13 @@
     "desiredSalary": "期望薪资",
     "industries": "行业",
     "remotePreference": "远程工作偏好",
-    "cv": "简历"
+    "cv": "简历",
+    "resume": "简历",
+    "uploadResume": "上传简历",
+    "downloadResume": "下载简历",
+    "nationality": "国籍：",
+    "education": "教育背景：",
+    "major": "专业："
   },
   "toast": {
     "aboutUpdated": "关于部分已更新",
@@ -87,6 +93,82 @@
     "personalInfoUpdated": "个人信息已更新",
     "personalInfoDescription": "您的个人信息已成功保存。",
     "profilePictureUpdated": "头像已更新",
-    "profilePictureDescription": "您的头像已成功更新。"
+    "profilePictureDescription": "您的头像已成功更新。",
+    "resumeUploaded": "简历已上传",
+    "resumeUploadedDescription": "您的简历已成功上传。",
+    "resumeDownloaded": "简历已下载",
+    "resumeDownloadedDescription": "您的简历已成功下载。",
+    "noResumeFound": "未找到简历",
+    "noResumeFoundDescription": "您还没有上传简历。请先上传一份简历。",
+    "downloadFailed": "下载失败",
+    "downloadFailedDescription": "无法下载您的简历。请稍后再试。"
+  },
+  "applications": {
+    "title": "工作申请",
+    "filters": {
+      "allApplications": "所有申请",
+      "pending": "待处理",
+      "underReview": "审核中",
+      "interviewed": "已面试",
+      "accepted": "已录取",
+      "rejected": "已拒绝"
+    },
+    "empty": {
+      "noApplications": "您还没有申请任何职位。开始探索机会吧！",
+      "noFilteredApplications": "没有找到符合所选筛选条件的申请。"
+    },
+    "actions": {
+      "viewDetails": "查看详情",
+      "withdraw": "撤回",
+      "loadMore": "加载更多申请",
+      "showAll": "显示所有申请",
+      "browseJobs": "浏览职位"
+    },
+    "confirmWithdraw": "您确定要撤回对\"{jobTitle}\"的申请吗？",
+    "applicationCount": "找到 {count} 个申请",
+    "jobTitleNotAvailable": "职位名称不可用",
+    "unknownCompany": "未知公司",
+    "loading": "加载中..."
+  },
+  "savedJobs": {
+    "title": "已保存职位",
+    "sort": {
+      "dateSaved": "保存日期",
+      "jobTitle": "职位名称",
+      "companyName": "公司名称",
+      "sortBy": "排序方式"
+    },
+    "search": {
+      "placeholder": "搜索已保存的职位..."
+    },
+    "empty": {
+      "noSavedJobs": "还没有保存的职位",
+      "noSavedJobsDescription": "您还没有保存任何职位。开始探索机会并保存您感兴趣的职位吧！",
+      "noFilteredJobs": "没有已保存的职位符合您的搜索条件。"
+    },
+    "actions": {
+      "viewJob": "查看职位",
+      "applyNow": "立即申请",
+      "remove": "移除",
+      "loadMore": "加载更多职位",
+      "refresh": "刷新",
+      "selectAll": "全选",
+      "deselectAll": "取消全选",
+      "removeSelected": "移除所选",
+      "filters": "筛选",
+      "tryAgain": "重试",
+      "browseJobs": "浏览职位"
+    },
+    "confirmRemove": "您确定要从已保存的职位中移除\"{jobTitle}\"吗？",
+    "jobCount": "已保存 {count} 个职位",
+    "selectedCount": "已选择 {count} 个职位",
+    "loading": "加载已保存的职位..."
+  },
+  "forms": {
+    "projectDescription": "项目描述、主要功能和影响..."
+  },
+  "loading": {
+    "profile": "加载个人资料...",
+    "pleaseLogin": "请登录以查看您的个人资料。"
   }
 }

@@ -2,11 +2,20 @@
   "title": "Find Your Dream Job with",
   "titleHighlight": "AI-Powered", 
   "titleEnd": "Matching",
-  "subtitle": "Huntier uses advanced AI to match your skills and preferences with the perfect job opportunities. Get personalized recommendations and apply with confidence.",
+  "subtitle": "Huntier provides end-to-end human resources solutions for multinational enterprises and professionals, breaking geographical barriers and building an AI-driven, highly efficient ecosystem.",
   "findJobsButton": "Find Jobs",
   "viewProfileButton": "View My Profile",
   "signInButton": "Sign In",
   "feature1": "AI-Powered Matching",
   "feature2": "10,000+ Jobs",
-  "feature3": "Free to Use"
+  "feature3": "Free to Use",
+  "ambassador": {
+    "title": "Join Huntier as",
+    "titleHighlight": "Campus Ambassador",
+    "subtitle": "Represent Huntier on your campus and unlock exclusive opportunities. Build your network, develop leadership skills, and gain early access to cutting-edge career tools while making a real impact in your university community.",
+    "becomeAmbassadorButton": "Become an Ambassador",
+    "learnMoreButton": "Learn More",
+    "limitedSpots": "Limited spots available",
+    "applyNow": "Apply now for exclusive access"
+  }
 }

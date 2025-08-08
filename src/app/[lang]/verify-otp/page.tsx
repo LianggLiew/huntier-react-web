@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Mail, Phone, ChevronDown, Sparkles, Check } from 'lucide-react';
+import Link from 'next/link';
+import { Mail, Phone, ChevronDown, Sparkles, Check, ArrowLeft } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,7 +14,7 @@ import { getDictionaryAsync } from '@/lib/dictionary';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigation } from '@/hooks/useNavigation';
 import { type LocalizedPageProps } from '@/lib/navigation';
-import { ApiResponse, OTPVerificationResponse } from '@/types/interface-contracts';
+import { ApiResponse, OTPVerificationResponse } from '@/types';
 
 export default function VerifyOTPPage({ params }: LocalizedPageProps) {
   const { toast } = useToast();
@@ -24,8 +25,8 @@ export default function VerifyOTPPage({ params }: LocalizedPageProps) {
   const [dictionary, setDictionary] = useState<any>({});
   const [dictionaryLoading, setDictionaryLoading] = useState(true);
   
-  // State for verification type (email/phone)
-  const [verificationType, setVerificationType] = useState<'email' | 'phone'>('phone');
+  // State for verification type (locked to phone only)
+  const [verificationType] = useState<'phone'>('phone');
   
   // State for input values
   const [contactValue, setContactValue] = useState('');
@@ -35,6 +36,7 @@ export default function VerifyOTPPage({ params }: LocalizedPageProps) {
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [countdown, setCountdown] = useState(60);
   const [isLoading, setIsLoading] = useState(false);
+  
   
   // State for country selection
   const [selectedCountry, setSelectedCountry] = useState({ code: '+60', name: 'Malaysia', flag: '🇲🇾' });
@@ -83,15 +85,15 @@ export default function VerifyOTPPage({ params }: LocalizedPageProps) {
     }
   }, [lang]);
   
-  // Toggle between email and phone verification
-  const toggleVerificationType = () => {
-    setVerificationType(prev => prev === 'email' ? 'phone' : 'email');
-    setContactValue('');
-    setOtpValue('');
-    setIsOtpSent(false);
-    setCountdown(60);
-    setIsCountryDropdownOpen(false);
-  };
+  // Toggle between email and phone verification (disabled for phone-only mode)
+  // const toggleVerificationType = () => {
+  //   setVerificationType(prev => prev === 'email' ? 'phone' : 'email');
+  //   setContactValue('');
+  //   setOtpValue('');
+  //   setIsOtpSent(false);
+  //   setCountdown(60);
+  //   setIsCountryDropdownOpen(false);
+  // };
   
   // Handle country selection
   const handleCountrySelect = (country: typeof countries[0]) => {
@@ -236,7 +238,7 @@ export default function VerifyOTPPage({ params }: LocalizedPageProps) {
 
       const result: ApiResponse<OTPVerificationResponse> = await response.json();
 
-      if (response.ok && result.success && result.data) {
+      if (response.ok && result.success && result.data && result.data.sessionToken && result.data.user) {
         // Login successful - use auth context
         await login(result.data.sessionToken, result.data.user);
         
@@ -245,14 +247,39 @@ export default function VerifyOTPPage({ params }: LocalizedPageProps) {
           description: dictionary.verifyOtp.errors.verificationSuccessfulDescription 
         });
 
-        // Redirect based on API response using localized navigation
-        const destination = result.data.redirectTo || 'jobs';
-        // Remove leading slash if present since push() handles localization
-        const cleanDestination = destination.startsWith('/') ? destination.slice(1) : destination;
-        push(cleanDestination);
+        // Check if user needs onboarding first
+        if (result.data.user?.needsOnboarding) {
+          // Redirect to onboarding for new users
+          // Keep the stored redirect for after onboarding completion
+          push('onboarding');
+        } else {
+          // Check for stored redirect URL from guest application flow
+          let destination = result.data.redirectTo || 'jobs';
+          
+          // Check localStorage for redirect after auth (for existing users who clicked Apply)
+          if (typeof window !== 'undefined') {
+            const storedRedirect = localStorage.getItem('huntier_redirect_after_auth');
+            if (storedRedirect) {
+              // Clean up the stored redirect
+              localStorage.removeItem('huntier_redirect_after_auth');
+              // Use stored redirect, removing language prefix if present
+              // Handle URLs like "/en/jobs/123" -> "jobs/123"
+              const cleanStoredRedirect = storedRedirect.replace(/^\/[a-z]{2}\//, '') || 'jobs';
+              destination = cleanStoredRedirect;
+            }
+          }
+          
+          // Remove leading slash if present since push() handles localization
+          const cleanDestination = destination.startsWith('/') ? destination.slice(1) : destination;
+          push(cleanDestination);
+        }
       } else {
         // Handle specific error cases
         if (result.data?.blacklisted) {
+          // Clear any stored redirect on security issues
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('huntier_redirect_after_auth');
+          }
           toast({ 
             title: dictionary.verifyOtp.errors.accessRestricted, 
             description: dictionary.verifyOtp.errors.accessRestrictedDescription, 
@@ -339,6 +366,17 @@ export default function VerifyOTPPage({ params }: LocalizedPageProps) {
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGZpbGw9IiMxMGIyODEiIGZpbGwtb3BhY2l0eT0iLjAyIiBkPSJNMzYgMzRoLTJ2LTJoMnYyem0tNCAwaDJ2LTJoMnptLTQgMGgydi0yaDB6Ii8+PC9nPjwvc3ZnPg==')] opacity-15 dark:opacity-8"></div>
       </div>
 
+      {/* Back to home button - positioned at top left corner */}
+      <div className="absolute top-3.5 left-3.5 z-20">
+        <Link
+          href={`/${lang}`}
+          className="inline-flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors group"
+        >
+          <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+          Back to Home
+        </Link>
+      </div>
+
       {/* Main content */}
       <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
         <div className="w-full max-w-md">
@@ -354,8 +392,13 @@ export default function VerifyOTPPage({ params }: LocalizedPageProps) {
               </span>
             </div>
             
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-700 to-gray-600 dark:from-white dark:via-gray-200 dark:to-gray-400">
-              {dictionary.verifyOtp.passwordlessLogin}
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-700 to-gray-600 dark:from-white dark:via-gray-200 dark:to-gray-400">
+                Welcome to{' '}
+              </span>
+              <span className="text-emerald-600 dark:text-emerald-400">
+                Huntier
+              </span>
             </h1>
             <p className="text-muted-foreground text-lg">
               {dictionary.verifyOtp.verifyIdentity}
@@ -373,21 +416,26 @@ export default function VerifyOTPPage({ params }: LocalizedPageProps) {
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <span>{dictionary.verifyOtp.findJob}</span>
-                    <span className="text-emerald-600 dark:text-emerald-400">{dictionary.verifyOtp.wantToHire}</span>
+                    <Link 
+                      href="mailto:general@gohuntier.com" 
+                      className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:underline transition-colors"
+                    >
+                      {dictionary.verifyOtp.wantToHire}
+                    </Link>
                   </div>
                 </div>
                 
-                {/* Toggle button */}
+                {/* Toggle button - disabled for phone-only verification */}
                 <button 
-                  onClick={toggleVerificationType}
-                  className="group flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
-                  aria-label={verificationType === 'email' ? 'Switch to phone verification' : 'Switch to email verification'}
+                  disabled
+                  className="group flex items-center gap-2 px-4 py-3 rounded-lg opacity-50 cursor-not-allowed"
+                  aria-label="Email verification temporarily unavailable"
                 >
-                  <div className="p-1.5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 group-hover:bg-emerald-200 dark:group-hover:bg-emerald-800/50 transition-colors">
+                  <div className="p-2.5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 group-hover:bg-emerald-200 dark:group-hover:bg-emerald-800/50 transition-all group-hover:scale-110">
                     {verificationType === 'email' ? (
-                      <Phone className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                      <Phone className="h-6 w-6 text-emerald-600 dark:text-emerald-400 transition-transform group-hover:rotate-12" />
                     ) : (
-                      <Mail className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                      <Mail className="h-6 w-6 text-emerald-600 dark:text-emerald-400 transition-transform group-hover:-rotate-12" />
                     )}
                   </div>
                 </button>
@@ -549,7 +597,7 @@ export default function VerifyOTPPage({ params }: LocalizedPageProps) {
                 )}
               </div>
               
-              {/* WeChat login option */}
+              {/* WeChat login option
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-emerald-100 dark:border-emerald-800"></div>
@@ -569,19 +617,18 @@ export default function VerifyOTPPage({ params }: LocalizedPageProps) {
                   </div>
                   {dictionary.verifyOtp.wechatLogin}
                 </div>
-              </Button>
+              </Button> */}
             </CardContent>
           </Card>
           
           {/* Footer */}
           <div className="mt-8 text-center space-y-4">
-            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-              <input type="checkbox" className="rounded border-emerald-300 text-emerald-600 focus:ring-emerald-500" />
-              <span>
-                {dictionary.verifyOtp.termsText}{' '}
-                <a href="#" className="text-emerald-600 dark:text-emerald-400 hover:underline">{dictionary.verifyOtp.termsOfService}</a>{' '}
+            <div className="text-sm text-muted-foreground">
+              <span className="whitespace-nowrap">
+                By signing in, you agree to{' '}
+                <Link href={`/${lang}/terms`} target="_blank" rel="noopener noreferrer" className="text-emerald-600 dark:text-emerald-400 hover:underline">{dictionary.verifyOtp.termsOfService}</Link>{' '}
                 {dictionary.verifyOtp.and}{' '}
-                <a href="#" className="text-emerald-600 dark:text-emerald-400 hover:underline">{dictionary.verifyOtp.privacyPolicy}</a>
+                <Link href={`/${lang}/privacy`} target="_blank" rel="noopener noreferrer" className="text-emerald-600 dark:text-emerald-400 hover:underline">{dictionary.verifyOtp.privacyPolicy}</Link>
               </span>
             </div>
             

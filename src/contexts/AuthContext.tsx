@@ -32,8 +32,8 @@ export function AuthProvider({ children, initialAuth }: AuthProviderProps): Reac
   // Computed state
   const isAuthenticated = Boolean(user?.isAuthenticated)
 
-  // Validate session on mount and periodically
-  const validateSession = useCallback(async () => {
+  // Validate session with automatic refresh on failure
+  const validateSession = useCallback(async (skipRefresh: boolean = false) => {
     try {
       setLoading(true)
       setError(null)
@@ -48,18 +48,65 @@ export function AuthProvider({ children, initialAuth }: AuthProviderProps): Reac
       if (result.success && result.data?.valid && result.data.user) {
         setUser(result.data.user)
         setProfile(result.data.profile || null)
+        return true
       } else {
+        // If session is invalid and we haven't tried refresh yet, attempt token refresh
+        if (!skipRefresh && response.status === 401) {
+          console.log('Session expired, attempting token refresh...')
+          
+          const refreshResponse = await fetch('/api/auth/refresh', {
+            method: 'POST',
+            credentials: 'include'
+          })
+
+          if (refreshResponse.ok) {
+            const refreshResult = await refreshResponse.json()
+            
+            if (refreshResult.success && refreshResult.data?.user) {
+              console.log('Token refresh successful')
+              setUser({
+                ...refreshResult.data.user,
+                isAuthenticated: true
+              })
+              
+              // Try to fetch profile after successful refresh
+              try {
+                const profileResponse = await fetch('/api/user/profile', {
+                  method: 'GET',
+                  credentials: 'include'
+                })
+
+                if (profileResponse.ok) {
+                  const profileResult = await profileResponse.json()
+                  if (profileResult.success && profileResult.data) {
+                    setProfile(profileResult.data)
+                  }
+                }
+              } catch (profileError) {
+                console.warn('Failed to fetch profile after refresh:', profileError)
+              }
+              
+              return true
+            }
+          }
+          
+          console.warn('Token refresh failed, user needs to login again')
+        }
+        
+        // Clear user state if validation and refresh both failed
         setUser(null)
         setProfile(null)
         if (result.error) {
           console.warn('Session validation failed:', result.error)
         }
+        return false
       }
     } catch (err) {
       console.error('Session validation error:', err)
       setUser(null)
       setProfile(null)
       setError('Failed to validate session')
+      return false
     } finally {
       setLoading(false)
     }
@@ -120,16 +167,68 @@ export function AuthProvider({ children, initialAuth }: AuthProviderProps): Reac
       // Clear client state
       setUser(null)
       setProfile(null)
+
+      // Clear localStorage data to prevent data leakage between users
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('userProfileImage')
+        localStorage.removeItem('userPersonalInfo')
+        localStorage.removeItem('userProfileData')
+        localStorage.removeItem('huntier_redirect_after_auth')
+      }
     } catch (err) {
       console.error('Logout error:', err)
-      // Even if API fails, clear client state
+      // Even if API fails, clear client state and localStorage
       setUser(null)
       setProfile(null)
+      
+      // Clear localStorage even on error to prevent data leakage
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('userProfileImage')
+        localStorage.removeItem('userPersonalInfo')
+        localStorage.removeItem('userProfileData')
+        localStorage.removeItem('huntier_redirect_after_auth')
+      }
       setError('Logout failed')
     } finally {
       setLoading(false)
     }
   }, [])
+
+  // Proactive token refresh - checks if token expires soon and refreshes it
+  const checkAndRefreshToken = useCallback(async () => {
+    if (!isAuthenticated) return false
+
+    try {
+      const refreshResponse = await fetch('/api/auth/refresh', {
+        method: 'POST',
+        credentials: 'include'
+      })
+
+      if (refreshResponse.ok) {
+        const refreshResult = await refreshResponse.json()
+        
+        if (refreshResult.success && refreshResult.data?.user) {
+          console.log('Proactive token refresh successful')
+          setUser(current => ({
+            ...current!,
+            ...refreshResult.data.user,
+            isAuthenticated: true
+          }))
+          return true
+        }
+      } else if (refreshResponse.status === 401) {
+        // Refresh token expired, user needs to login again
+        console.warn('Refresh token expired, logging out user')
+        setUser(null)
+        setProfile(null)
+        return false
+      }
+    } catch (error) {
+      console.warn('Proactive token refresh failed:', error)
+    }
+    
+    return false
+  }, [isAuthenticated])
 
   // Update user data
   const updateUser = useCallback((updates: Partial<User>): void => {
@@ -192,6 +291,17 @@ export function AuthProvider({ children, initialAuth }: AuthProviderProps): Reac
 
     return () => clearInterval(interval)
   }, [isAuthenticated, validateSession])
+
+  // Set up proactive token refresh (every 20 minutes - before JWT expires at 24 hours)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (isAuthenticated) {
+        checkAndRefreshToken()
+      }
+    }, 20 * 60 * 1000) // 20 minutes
+
+    return () => clearInterval(interval)
+  }, [isAuthenticated, checkAndRefreshToken])
 
   // Context value
   const contextValue: AuthContextType = {

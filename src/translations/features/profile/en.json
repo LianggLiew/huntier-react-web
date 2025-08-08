@@ -72,7 +72,10 @@
     "cv": "My Resume",
     "resume": "Resume",
     "uploadResume": "Upload Resume",
-    "downloadResume": "Download Resume"
+    "downloadResume": "Download Resume",
+    "nationality": "Nationality:",
+    "education": "Education:",
+    "major": "Major:"
   },
   "toast": {
     "aboutUpdated": "About section updated",
@@ -94,6 +97,80 @@
     "resumeUploaded": "Resume uploaded",
     "resumeUploadedDescription": "Your resume has been uploaded successfully.",
     "resumeDownloaded": "Resume downloaded",
-    "resumeDownloadedDescription": "Your resume has been downloaded successfully."
+    "resumeDownloadedDescription": "Your resume has been downloaded successfully.",
+    "resumeUploaded": "Resume uploaded",
+    "resumeUploadedDescription": "Your resume has been uploaded successfully.",
+    "noResumeFound": "No Resume Found",
+    "noResumeFoundDescription": "You haven't uploaded a resume yet. Please upload one first.",
+    "downloadFailed": "Download Failed",
+    "downloadFailedDescription": "Unable to download your resume. Please try again later."
+  },
+  "applications": {
+    "title": "Job Applications",
+    "filters": {
+      "allApplications": "All Applications",
+      "pending": "Pending",
+      "underReview": "Under Review",
+      "interviewed": "Interviewed",
+      "accepted": "Accepted",
+      "rejected": "Rejected"
+    },
+    "empty": {
+      "noApplications": "You haven't applied to any jobs yet. Start exploring opportunities!",
+      "noFilteredApplications": "No applications found with the selected filter."
+    },
+    "actions": {
+      "viewDetails": "View Details",
+      "withdraw": "Withdraw",
+      "loadMore": "Load More Applications",
+      "showAll": "Show All Applications",
+      "browseJobs": "Browse Jobs"
+    },
+    "confirmWithdraw": "Are you sure you want to withdraw your application for \"{jobTitle}\"?",
+    "applicationCount": "{count} application{plural} found",
+    "jobTitleNotAvailable": "Job Title Not Available",
+    "unknownCompany": "Unknown Company",
+    "loading": "Loading..."
+  },
+  "savedJobs": {
+    "title": "Saved Jobs",
+    "sort": {
+      "dateSaved": "Date Saved",
+      "jobTitle": "Job Title",
+      "companyName": "Company Name",
+      "sortBy": "Sort by"
+    },
+    "search": {
+      "placeholder": "Search saved jobs..."
+    },
+    "empty": {
+      "noSavedJobs": "No Saved Jobs Yet",
+      "noSavedJobsDescription": "You haven't saved any jobs yet. Start exploring opportunities and save the ones you're interested in!",
+      "noFilteredJobs": "No saved jobs match your search criteria."
+    },
+    "actions": {
+      "viewJob": "View Job",
+      "applyNow": "Apply Now",
+      "remove": "Remove",
+      "loadMore": "Load More Jobs",
+      "refresh": "Refresh",
+      "selectAll": "Select All",
+      "deselectAll": "Deselect All",
+      "removeSelected": "Remove Selected",
+      "filters": "Filters",
+      "tryAgain": "Try Again",
+      "browseJobs": "Browse Jobs"
+    },
+    "confirmRemove": "Are you sure you want to remove \"{jobTitle}\" from your saved jobs?",
+    "jobCount": "{count} job{plural} saved",
+    "selectedCount": "{count} job{plural} selected",
+    "loading": "Loading saved jobs..."
+  },
+  "forms": {
+    "projectDescription": "Project description, key features, and impact..."
+  },
+  "loading": {
+    "profile": "Loading profile...",
+    "pleaseLogin": "Please log in to view your profile."
   }
 }

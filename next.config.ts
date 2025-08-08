@@ -10,6 +10,9 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
+  experimental: {
+    // missingSuspenseWithCSRBailout option has been removed in newer Next.js versions
+  },
 };
 
 export default nextConfig;

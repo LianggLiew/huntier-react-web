@@ -9,11 +9,11 @@ import { ClientProviders } from "@/components/providers/ClientProviders"
 
 const inter = Inter({ subsets: ["latin"] })
 
-export const metadata: Metadata = {
-  title: "Huntier - AI-Powered Job Matching Platform",
-  description: "Find your dream job with AI-powered matching technology",
-    generator: 'v0.dev'
-}
+// export const metadata: Metadata = {
+//   title: "Huntier - AI-Powered Job Matching Platform",
+//   description: "Find your dream job with AI-powered matching technology",
+//     generator: 'v0.dev'
+// }
 
 export default function RootLayout({
   children,
@@ -22,6 +22,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+      </head>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <TooltipProvider>
